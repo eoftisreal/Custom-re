@@ -19,6 +19,11 @@ persist.sys.cust.lte_config=true
 persist.radio.is_wps_enabled=true
 persist.radio.videocall.audio.output=0
 
+# IMS - Debug/Overrides for Samsung RIL
+persist.dbg.volte_avail_ovr=1
+persist.dbg.ims_volte_enable=1
+persist.radio.jbims=1
+
 # Graphics
 ro.sf.lcd_density=320
 debug.sf.latch_unsignaled=1
