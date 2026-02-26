@@ -1,0 +1,30 @@
+# Init script for Samsung Galaxy J7 (2016)
+
+import /vendor/etc/init/hw/init.exynos7870.rc
+import /vendor/etc/init/hw/init.samsung.rc
+
+on early-init
+    mount debugfs debugfs /sys/kernel/debug
+    chmod 0755 /sys/kernel/debug
+
+on init
+    # Support legacy paths
+    symlink /sdcard /storage/sdcard0
+
+on fs
+    mount_all /vendor/etc/fstab.exynos7870
+
+on post-fs-data
+    # Create directory for EFS
+    mkdir /efs 0771 radio system
+
+on boot
+    # Permissions
+    chown system system /sys/class/backlight/panel/brightness
+    chmod 0660 /sys/class/backlight/panel/brightness
+
+service ril-daemon /vendor/bin/hw/rild
+    class main
+    user radio
+    group radio cache inet misc audio log readproc wakelock
+    capabilities BLOCK_SUSPEND NET_ADMIN NET_RAW
