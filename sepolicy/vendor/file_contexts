@@ -1,13 +1,30 @@
-# Devices
-/dev/block/platform/13540000\.dwmmc0/by-name/radio       u:object_r:radio_device:s0
-/dev/block/platform/13540000\.dwmmc0/by-name/efs         u:object_r:efs_block_device:s0
-/dev/block/platform/13540000\.dwmmc0/by-name/system      u:object_r:system_block_device:s0
-/dev/block/platform/13540000\.dwmmc0/by-name/userdata    u:object_r:userdata_block_device:s0
-/dev/block/platform/13540000\.dwmmc0/by-name/cache       u:object_r:cache_block_device:s0
-/dev/block/platform/13540000\.dwmmc0/by-name/boot        u:object_r:boot_block_device:s0
-/dev/block/platform/13540000\.dwmmc0/by-name/recovery    u:object_r:recovery_block_device:s0
-
-# Executables
+# RIL
 /vendor/bin/hw/rild         u:object_r:rild_exec:s0
+
+# WiFi
 /vendor/bin/hw/wpa_supplicant u:object_r:hal_wifi_supplicant_default_exec:s0
 /vendor/bin/hw/hostapd      u:object_r:hal_wifi_hostapd_default_exec:s0
+
+# Bluetooth
+/vendor/bin/hw/android\.hardware\.bluetooth@1\.0-service u:object_r:hal_bluetooth_default_exec:s0
+
+# Sensors
+/vendor/bin/hw/android\.hardware\.sensors@1\.0-service u:object_r:hal_sensors_default_exec:s0
+
+# GPS
+/vendor/bin/hw/android\.hardware\.gnss@1\.0-service   u:object_r:hal_gnss_default_exec:s0
+/vendor/bin/gpsd                                      u:object_r:gpsd_exec:s0
+
+# Camera
+/vendor/bin/hw/android\.hardware\.camera\.provider@2\.4-service   u:object_r:hal_camera_default_exec:s0
+/vendor/bin/cameraserver                              u:object_r:cameraserver_exec:s0
+
+# Audio
+/vendor/bin/hw/android\.hardware\.audio@2\.0-service  u:object_r:hal_audio_default_exec:s0
+
+# Graphics
+/vendor/bin/hw/android\.hardware\.graphics\.composer@2\.1-service    u:object_r:hal_graphics_composer_default_exec:s0
+/vendor/bin/hw/android\.hardware\.graphics\.allocator@2\.0-service   u:object_r:hal_graphics_allocator_default_exec:s0
+
+# DRM
+/vendor/bin/hw/android\.hardware\.drm@1\.0-service        u:object_r:hal_drm_default_exec:s0

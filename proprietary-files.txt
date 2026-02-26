@@ -1,5 +1,5 @@
 # Proprietary files for Samsung Galaxy J7 (2016)
-# Based on LineageOS 18.1 for Exynos 7870 devices (e.g., j7elte, j5xelte)
+# Based on LineageOS 18.1 for Exynos 7870 devices
 
 # Audio
 lib/libaudioroute.so
@@ -14,12 +14,26 @@ vendor/lib/soundfx/libreverbwrapper.so
 vendor/lib/soundfx/libvisualizer.so
 vendor/lib/hw/audio.primary.exynos7870.so
 vendor/lib/hw/audio_policy.exynos7870.so
+vendor/lib64/libaudioroute.so
+vendor/lib64/libtinyalsa.so
+vendor/lib64/libaudioeffectoffload.so
+vendor/lib64/soundfx/libaudiopreprocessing.so
+vendor/lib64/soundfx/libbundlewrapper.so
+vendor/lib64/soundfx/libdownmix.so
+vendor/lib64/soundfx/libeffectproxy.so
+vendor/lib64/soundfx/libldnhncr.so
+vendor/lib64/soundfx/libreverbwrapper.so
+vendor/lib64/soundfx/libvisualizer.so
+vendor/lib64/hw/audio.primary.exynos7870.so
+vendor/lib64/hw/audio_policy.exynos7870.so
 
 # Bluetooth
 bin/libbt-vendor.so
 vendor/lib/libbt-vendor.so
 vendor/lib/hw/bluetooth.default.so
 vendor/etc/init/init.bluetooth.rc
+vendor/lib64/libbt-vendor.so
+vendor/lib64/hw/bluetooth.default.so
 
 # Camera
 lib/libcamera_client.so
@@ -29,10 +43,15 @@ vendor/lib/hw/camera.exynos7870.so
 vendor/lib/libfimc-is-interface.so
 vendor/lib/libfimc-is-v4l2.so
 vendor/bin/cameraserver
+vendor/lib64/libexynoscamera.so
+vendor/lib64/hw/camera.exynos7870.so
+vendor/lib64/libfimc-is-interface.so
+vendor/lib64/libfimc-is-v4l2.so
 
 # DRM
 vendor/lib/libdrm.so
 vendor/lib/libdrm_freedreno.so
+vendor/lib64/libdrm.so
 
 # Graphics (Mali T830)
 vendor/lib/egl/libEGL_mali.so
@@ -42,6 +61,13 @@ vendor/lib/hw/gralloc.exynos7870.so
 vendor/lib/hw/hwcomposer.exynos7870.so
 vendor/lib/libion.so
 vendor/lib/libmali.so
+vendor/lib64/egl/libEGL_mali.so
+vendor/lib64/egl/libGLESv1_CM_mali.so
+vendor/lib64/egl/libGLESv2_mali.so
+vendor/lib64/hw/gralloc.exynos7870.so
+vendor/lib64/hw/hwcomposer.exynos7870.so
+vendor/lib64/libion.so
+vendor/lib64/libmali.so
 
 # Media
 vendor/lib/libstagefrighthw.so
@@ -49,6 +75,11 @@ vendor/lib/libOmxCore.so
 vendor/lib/libOmxVdec.so
 vendor/lib/libOmxVenc.so
 vendor/lib/libomx_exynos_v4l2.so
+vendor/lib64/libstagefrighthw.so
+vendor/lib64/libOmxCore.so
+vendor/lib64/libOmxVdec.so
+vendor/lib64/libOmxVenc.so
+vendor/lib64/libomx_exynos_v4l2.so
 
 # RIL
 bin/rild
@@ -57,10 +88,16 @@ vendor/lib/libsec-ril.so
 vendor/lib/libsec-ril-dsds.so
 vendor/lib/libreference-ril.so
 vendor/lib/librilutils.so
+vendor/lib64/libsec-ril.so
+vendor/lib64/libsec-ril-dsds.so
+vendor/lib64/libreference-ril.so
+vendor/lib64/librilutils.so
 
 # Sensors
 vendor/lib/hw/sensors.exynos7870.so
 vendor/lib/libsensorservice.so
+vendor/lib64/hw/sensors.exynos7870.so
+vendor/lib64/libsensorservice.so
 
 # WiFi
 vendor/bin/hw/wpa_supplicant
@@ -70,8 +107,11 @@ vendor/lib/modules/dhd.ko
 vendor/etc/wifi/wpa_supplicant.conf
 vendor/etc/wifi/wpa_supplicant_overlay.conf
 vendor/etc/wifi/p2p_supplicant_overlay.conf
+vendor/lib64/libwpa_client.so
 
 # Other
 vendor/lib/libgnss.so
 vendor/lib/libgps.so
 vendor/bin/gpsd
+vendor/lib64/libgnss.so
+vendor/lib64/libgps.so

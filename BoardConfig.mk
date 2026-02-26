@@ -46,7 +46,7 @@ TARGET_USERIMAGES_USE_F2FS := true
 BOARD_BUILD_SYSTEM_ROOT_IMAGE := false # Android 11 legacy handling for non-AB devices, verify if true is needed for your specific setup. Often false for older devices on R.
 
 # Recovery
-TARGET_RECOVERY_FSTAB := device/samsung/j7xelte/rootdir/etc/fstab.exynos7870
+TARGET_RECOVERY_FSTAB := device/samsung/j7xelte/rootdir/etc/recovery.fstab
 
 # SELinux
 BOARD_SEPOLICY_DIRS += \
