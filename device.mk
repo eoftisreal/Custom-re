@@ -25,5 +25,8 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/etc/init.j7xelte.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.j7xelte.rc
 
+# System Properties
+TARGET_SYSTEM_PROP += $(LOCAL_PATH)/system.prop
+
 # Inherit from vendor
 $(call inherit-product-if-exists, vendor/samsung/j7xelte/j7xelte-vendor.mk)

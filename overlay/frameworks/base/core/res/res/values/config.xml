@@ -60,4 +60,13 @@
     <!-- Whether the device supports Smart Pixels -->
     <bool name="config_enableSmartPixels">true</bool>
 
+    <!-- Whether VoLTE is available for the carrier -->
+    <bool name="config_carrier_volte_available">true</bool>
+
+    <!-- Whether VoLTE should be enabled by default -->
+    <bool name="config_ims_volte_enabled_by_default">true</bool>
+
+    <!-- Whether the Enhanced 4G LTE toggle is editable -->
+    <bool name="config_editable_enhanced_4g_lte">true</bool>
+
 </resources>

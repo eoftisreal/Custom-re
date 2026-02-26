@@ -3,3 +3,7 @@ type gpsd, domain;
 type gpsd_exec, exec_type, vendor_file_type, file_type;
 
 init_daemon_domain(gpsd)
+
+# IMS / VoLTE
+# Note: Monitor 'avc: denied' logs for these domains if IMS fails to register.
+# Common denials often involve 'connectto' permissions for ims service.

@@ -93,6 +93,19 @@ vendor/lib64/libsec-ril-dsds.so
 vendor/lib64/libreference-ril.so
 vendor/lib64/librilutils.so
 
+# IMS / VoLTE
+vendor/lib/libims_jni.so
+vendor/lib/libips.so
+vendor/lib64/libims_jni.so
+vendor/lib64/libips.so
+app/ims.apk
+app/imsservice.apk
+app/imssettings.apk
+
+# Carrier Config
+app/CarrierConfig.apk
+app/CarrierConfigOverlay.apk
+
 # Sensors
 vendor/lib/hw/sensors.exynos7870.so
 vendor/lib/libsensorservice.so
