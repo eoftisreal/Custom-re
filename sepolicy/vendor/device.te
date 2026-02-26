@@ -1,3 +1,5 @@
-# Device types
-type radio_device, dev_type;
-type efs_block_device, dev_type;
+# RIL
+type gpsd, domain;
+type gpsd_exec, exec_type, vendor_file_type, file_type;
+
+init_daemon_domain(gpsd)

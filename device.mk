@@ -14,12 +14,12 @@ PRODUCT_COPY_FILES += \
 
 # Rootdir
 PRODUCT_PACKAGES += \
-    fstab.exynos7870 \
     init.j7xelte.rc
 
-# Copy fstab to ramdisk
+# Copy fstab to ramdisk (for first stage init) and vendor (for second stage mount_all)
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/rootdir/etc/fstab.exynos7870:$(TARGET_COPY_OUT_RAMDISK)/fstab.exynos7870
+    $(LOCAL_PATH)/rootdir/etc/fstab.exynos7870:$(TARGET_COPY_OUT_RAMDISK)/fstab.exynos7870 \
+    $(LOCAL_PATH)/rootdir/etc/fstab.exynos7870:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.exynos7870
 
 # Init scripts
 PRODUCT_COPY_FILES += \
