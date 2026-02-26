@@ -21,8 +21,12 @@ TARGET_SOC := exynos7870
 
 # Kernel
 BOARD_KERNEL_CMDLINE := console=ttySAC2,115200 androidboot.hardware=exynos7870 androidboot.selinux=permissive
+# TODO: Replace with verified values from stock SM-J710FN boot.img
 BOARD_KERNEL_BASE := 0x10000000
 BOARD_KERNEL_PAGESIZE := 2048
+BOARD_KERNEL_OFFSET := 0x00008000
+BOARD_RAMDISK_OFFSET := 0x01000000
+BOARD_TAGS_OFFSET := 0x00000100
 BOARD_KERNEL_IMAGE_NAME := Image.gz-dtb
 TARGET_KERNEL_ARCH := arm64
 TARGET_KERNEL_HEADER_VERSION := 0
@@ -46,7 +50,7 @@ TARGET_USERIMAGES_USE_F2FS := true
 BOARD_BUILD_SYSTEM_ROOT_IMAGE := false # Android 11 legacy handling for non-AB devices, verify if true is needed for your specific setup. Often false for older devices on R.
 
 # Recovery
-TARGET_RECOVERY_FSTAB := device/samsung/j7xelte/rootdir/etc/recovery.fstab
+TARGET_RECOVERY_FSTAB := device/samsung/j7xelte/recovery.fstab
 
 # SELinux
 BOARD_SEPOLICY_DIRS += \
