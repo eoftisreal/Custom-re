@@ -3,7 +3,7 @@
 ## Target Platform
 - **Device:** Samsung Galaxy J7 2016 (Exynos 7870) — j7xelte
 - **Kernel:** Linux 3.18.140
-- **ROM Base:** LineageOS / Android 10+
+- **ROM Base:** LineageOS / Android 12+
 - **Adapter:** TP-Link TL-WN823N (RTL8192EU)
 
 ## 1. Hardware Overview

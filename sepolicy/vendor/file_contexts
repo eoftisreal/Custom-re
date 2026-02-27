@@ -21,11 +21,24 @@
 /vendor/bin/cameraserver                              u:object_r:cameraserver_exec:s0
 
 # Audio
-/vendor/bin/hw/android\.hardware\.audio@2\.0-service  u:object_r:hal_audio_default_exec:s0
+/vendor/bin/hw/android\.hardware\.audio@6\.0-service  u:object_r:hal_audio_default_exec:s0
 
 # Graphics
 /vendor/bin/hw/android\.hardware\.graphics\.composer@2\.1-service    u:object_r:hal_graphics_composer_default_exec:s0
 /vendor/bin/hw/android\.hardware\.graphics\.allocator@2\.0-service   u:object_r:hal_graphics_allocator_default_exec:s0
 
 # DRM
-/vendor/bin/hw/android\.hardware\.drm@1\.0-service        u:object_r:hal_drm_default_exec:s0
+/vendor/bin/hw/android\.hardware\.drm@1\.3-service        u:object_r:hal_drm_default_exec:s0
+
+# Vendor binder devices (Android 12 Treble)
+/dev/vndbinder                                        u:object_r:vndbinder_device:s0
+/dev/hwbinder                                         u:object_r:hwbinder_device:s0
+
+# Vendor libraries and shims
+/vendor/lib/libshim_camera\.so                        u:object_r:vendor_file:s0
+/vendor/lib64/libshim_camera\.so                      u:object_r:vendor_file:s0
+/vendor/lib/libshim_ril\.so                           u:object_r:vendor_file:s0
+/vendor/lib64/libshim_ril\.so                         u:object_r:vendor_file:s0
+
+# ION device
+/dev/ion                                              u:object_r:ion_device:s0

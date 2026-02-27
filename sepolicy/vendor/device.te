@@ -7,3 +7,47 @@ init_daemon_domain(gpsd)
 # IMS / VoLTE
 # Note: Monitor 'avc: denied' logs for these domains if IMS fails to register.
 # Common denials often involve 'connectto' permissions for ims service.
+
+# Binder access for Android 12 HALs
+allow gpsd hwbinder_device:chr_file rw_file_perms;
+allow gpsd hwservicemanager:binder { call transfer };
+
+# Camera HAL
+type camera_vendor, domain;
+type camera_vendor_exec, exec_type, vendor_file_type, file_type;
+
+init_daemon_domain(camera_vendor)
+allow camera_vendor hwbinder_device:chr_file rw_file_perms;
+allow camera_vendor hwservicemanager:binder { call transfer };
+allow camera_vendor ion_device:chr_file rw_file_perms;
+
+# Sensors HAL
+type sensors_vendor, domain;
+type sensors_vendor_exec, exec_type, vendor_file_type, file_type;
+
+init_daemon_domain(sensors_vendor)
+allow sensors_vendor hwbinder_device:chr_file rw_file_perms;
+allow sensors_vendor hwservicemanager:binder { call transfer };
+
+# RIL daemon
+allow rild hwbinder_device:chr_file rw_file_perms;
+allow rild hwservicemanager:binder { call transfer };
+allow rild vndbinder_device:chr_file rw_file_perms;
+
+# Audio HAL
+type audio_vendor, domain;
+type audio_vendor_exec, exec_type, vendor_file_type, file_type;
+
+init_daemon_domain(audio_vendor)
+allow audio_vendor hwbinder_device:chr_file rw_file_perms;
+allow audio_vendor hwservicemanager:binder { call transfer };
+
+# Graphics / SurfaceFlinger
+type graphics_vendor, domain;
+type graphics_vendor_exec, exec_type, vendor_file_type, file_type;
+
+init_daemon_domain(graphics_vendor)
+allow graphics_vendor hwbinder_device:chr_file rw_file_perms;
+allow graphics_vendor hwservicemanager:binder { call transfer };
+allow graphics_vendor gpu_device:chr_file rw_file_perms;
+allow graphics_vendor ion_device:chr_file rw_file_perms;

@@ -20,7 +20,7 @@ BOARD_VENDOR := samsung
 TARGET_SOC := exynos7870
 
 # Kernel
-BOARD_KERNEL_CMDLINE := console=ttySAC2,115200 androidboot.hardware=exynos7870 androidboot.selinux=permissive
+BOARD_KERNEL_CMDLINE := console=ttySAC2,115200 androidboot.hardware=exynos7870
 # TODO: Replace with verified values from stock SM-J710FN boot.img
 BOARD_KERNEL_BASE := 0x10000000
 BOARD_KERNEL_PAGESIZE := 2048
@@ -32,6 +32,22 @@ TARGET_KERNEL_ARCH := arm64
 TARGET_KERNEL_HEADER_VERSION := 0
 TARGET_KERNEL_SOURCE := kernel/samsung/exynos7870
 TARGET_KERNEL_CONFIG := exynos7870_j7xelte_defconfig
+
+# Android 12 kernel config requirements (in addition to USB WiFi below):
+#   CONFIG_ANDROID_BINDER_IPC=y
+#   CONFIG_ANDROID_BINDER_DEVICES="binder,hwbinder,vndbinder"
+#   CONFIG_ANDROID_BINDER_IPC_SELFTEST=n
+#   CONFIG_ION=y
+#   CONFIG_ION_EXYNOS=y
+#   CONFIG_DM_VERITY=y
+#   CONFIG_EXT4_FS_ENCRYPTION=y
+#   CONFIG_ASHMEM=y
+#   CONFIG_FHANDLE=y
+#   CONFIG_CGROUPS=y
+#   CONFIG_MEMCG=y
+#   CONFIG_MEMCG_SWAP=y
+#   CONFIG_ZRAM=y
+#   CONFIG_CRYPTO_LZ4=y
 
 # External USB WiFi (RTL8192EU) - Kernel config requirements
 # These flags must be set in the kernel defconfig (exynos7870_j7xelte_defconfig):
@@ -56,14 +72,22 @@ BOARD_RECOVERYIMAGE_PARTITION_SIZE := 41943040
 
 # TODO: Replace with actual PIT values from heimdall print-pit
 BOARD_SYSTEMIMAGE_PARTITION_SIZE := 2147483648
+BOARD_VENDORIMAGE_PARTITION_SIZE := 524288000
 BOARD_USERDATAIMAGE_PARTITION_SIZE := 12884901888
 BOARD_CACHEIMAGE_PARTITION_SIZE := 268435456
 
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
 
+# Vendor partition
+BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
+TARGET_COPY_OUT_VENDOR := vendor
+
 # System as root
-BOARD_BUILD_SYSTEM_ROOT_IMAGE := false # Android 11 legacy handling for non-AB devices, verify if true is needed for your specific setup. Often false for older devices on R.
+BOARD_BUILD_SYSTEM_ROOT_IMAGE := false
+
+# VNDK
+BOARD_VNDK_VERSION := current
 
 # Recovery
 TARGET_RECOVERY_FSTAB := device/samsung/j7xelte/recovery.fstab

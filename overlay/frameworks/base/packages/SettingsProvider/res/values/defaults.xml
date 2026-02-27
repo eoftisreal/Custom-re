@@ -18,9 +18,9 @@
 
 <resources>
 
-    <!-- Modern UI: Faster default animation scales for snappier feel (0.75x) -->
-    <fraction name="def_window_animation_scale">75%</fraction>
-    <fraction name="def_transition_animation_scale">75%</fraction>
-    <fraction name="def_animator_duration_scale">75%</fraction>
+    <!-- Faster default animation scales for snappier feel on low-end hardware (0.5x) -->
+    <fraction name="def_window_animation_scale">50%</fraction>
+    <fraction name="def_transition_animation_scale">50%</fraction>
+    <fraction name="def_animator_duration_scale">50%</fraction>
 
 </resources>
