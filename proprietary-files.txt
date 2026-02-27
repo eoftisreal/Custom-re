@@ -117,6 +117,7 @@ vendor/bin/hw/wpa_supplicant
 vendor/bin/hw/hostapd
 vendor/lib/libwpa_client.so
 vendor/lib/modules/dhd.ko
+vendor/lib/modules/8192eu.ko
 vendor/etc/wifi/wpa_supplicant.conf
 vendor/etc/wifi/wpa_supplicant_overlay.conf
 vendor/etc/wifi/p2p_supplicant_overlay.conf

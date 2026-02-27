@@ -23,6 +23,9 @@ on boot
     chown system system /sys/class/backlight/panel/brightness
     chmod 0660 /sys/class/backlight/panel/brightness
 
+    # Load RTL8192EU USB WiFi driver module if present
+    insmod /vendor/lib/modules/8192eu.ko
+
 service ril-daemon /vendor/bin/hw/rild
     class main
     user radio

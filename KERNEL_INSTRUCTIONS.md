@@ -23,3 +23,73 @@ Example (Verify with your device!):
 ```makefile
 BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x01000000 --tags_offset 0x00000100 --dt_dir $(OUT)/obj/KERNEL_OBJ/arch/arm64/boot/dts
 ```
+
+## 3. RTL8192EU USB WiFi Driver (TP-Link TL-WN823N)
+
+This device tree includes support for loading the RTL8192EU out-of-tree kernel module (`8192eu.ko`) for external USB WiFi via TP-Link TL-WN823N (v2/v3).
+
+### Kernel Defconfig Requirements
+
+Ensure the following options are set in `exynos7870_j7xelte_defconfig`:
+
+```
+CONFIG_USB_SUPPORT=y
+CONFIG_USB=y
+CONFIG_USB_OTG=y
+CONFIG_USB_EHCI_HCD=y
+CONFIG_USB_NET_DRIVERS=y
+CONFIG_CFG80211=y
+CONFIG_MAC80211=y
+CONFIG_NET_RADIO=y
+CONFIG_PACKET=y
+CONFIG_CFG80211_WEXT=y
+CONFIG_MODULES=y
+CONFIG_MODULE_UNLOAD=y
+CONFIG_MODVERSIONS=y
+```
+
+### Building the Driver Module
+
+From the kernel source root (`kernel/samsung/exynos7870`):
+
+```bash
+export ARCH=arm64
+export CROSS_COMPILE=aarch64-linux-android-
+
+make M=drivers/net/wireless/rtl8192eu modules
+```
+
+This produces `8192eu.ko`. Verify with:
+
+```bash
+modinfo 8192eu.ko
+```
+
+Ensure `vermagic` matches `uname -r` on the target device. The module must be built with the **same compiler and LOCALVERSION** as the kernel.
+
+### Installation
+
+Place `8192eu.ko` in `vendor/lib/modules/` so it is included in the vendor image. The init script (`init.j7xelte.rc`) will load it automatically at boot.
+
+For testing before permanent integration:
+
+```bash
+adb push 8192eu.ko /data/local/tmp/
+adb shell su -c "insmod /data/local/tmp/8192eu.ko"
+adb shell dmesg | grep 8192
+```
+
+### Monitor Mode (Patched Driver Only)
+
+If using the aircrack-ng patched fork of rtl8192eu:
+
+```bash
+ip link set wlan1 down
+iw dev wlan1 set type monitor
+ip link set wlan1 up
+iw dev
+```
+
+Monitor mode and packet injection require the patched driver variant. The stock Realtek driver does not support these features.
+
+See `USB_WIFI_SETUP.md` for the full integration guide.
