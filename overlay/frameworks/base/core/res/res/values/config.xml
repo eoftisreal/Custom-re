@@ -75,7 +75,7 @@
     <!-- Modern UI: Enable smooth display dimming transitions -->
     <bool name="config_animateScreenLights">true</bool>
 
-    <!-- Modern UI: Notification LED - disable for modern ambient-display approach -->
+    <!-- Modern UI: Notification LED - disable for modern ambient display approach -->
     <bool name="config_intrusiveNotificationLed">false</bool>
 
     <!-- Optimize: Use dark mode for battery savings on AMOLED -->
