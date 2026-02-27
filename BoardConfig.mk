@@ -40,7 +40,7 @@ BOARD_RECOVERYIMAGE_PARTITION_SIZE := 41943040
 
 # TODO: Replace with actual PIT values from heimdall print-pit
 BOARD_SYSTEMIMAGE_PARTITION_SIZE := 2147483648
-BOARD_USERDATAIMAGE_PARTITION_SIZE := 0 # Placeholder
+BOARD_USERDATAIMAGE_PARTITION_SIZE := 12884901888
 BOARD_CACHEIMAGE_PARTITION_SIZE := 268435456
 
 TARGET_USERIMAGES_USE_EXT4 := true
@@ -53,8 +53,8 @@ BOARD_BUILD_SYSTEM_ROOT_IMAGE := false # Android 11 legacy handling for non-AB d
 TARGET_RECOVERY_FSTAB := device/samsung/j7xelte/recovery.fstab
 
 # SELinux
-BOARD_SEPOLICY_DIRS += \
-    device/samsung/j7xelte/sepolicy
+BOARD_VENDOR_SEPOLICY_DIRS += \
+    device/samsung/j7xelte/sepolicy/vendor
 
 # HIDL
 DEVICE_MANIFEST_FILE := device/samsung/j7xelte/manifest.xml

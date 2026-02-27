@@ -1,4 +1,4 @@
-# RIL
+# GPS
 type gpsd, domain;
 type gpsd_exec, exec_type, vendor_file_type, file_type;
 
