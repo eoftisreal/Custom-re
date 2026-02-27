@@ -8,12 +8,57 @@ The kernel source should be placed in `kernel/samsung/exynos7870`.
 You can use the `lineage.dependencies` file to automatically fetch it, or add it to your local manifest (`.repo/local_manifests/j7xelte.xml`):
 
 ```xml
-<project path="kernel/samsung/exynos7870" name="android_kernel_samsung_exynos7870" remote="github" revision="lineage-18.1" />
+<project path="kernel/samsung/exynos7870" name="android_kernel_samsung_exynos7870" remote="github" revision="lineage-19.1" />
 ```
 
 *Note: Ensure you replace `android_kernel_samsung_exynos7870` with the actual repository name you are using.*
 
-## 2. Boot Image Configuration
+## 2. Android 12 Kernel Config Requirements
+
+The following kernel config options are **required** for Android 12 compatibility on kernel 3.18:
+
+### Binder IPC (critical)
+```
+CONFIG_ANDROID_BINDER_IPC=y
+CONFIG_ANDROID_BINDER_DEVICES="binder,hwbinder,vndbinder"
+CONFIG_ANDROID_BINDER_IPC_SELFTEST=n
+```
+
+### Memory Management
+```
+CONFIG_ASHMEM=y
+CONFIG_ION=y
+CONFIG_ION_EXYNOS=y
+CONFIG_CGROUPS=y
+CONFIG_MEMCG=y
+CONFIG_MEMCG_SWAP=y
+CONFIG_ZRAM=y
+CONFIG_CRYPTO_LZ4=y
+CONFIG_FHANDLE=y
+```
+
+### Security
+```
+CONFIG_DM_VERITY=y
+CONFIG_EXT4_FS_ENCRYPTION=y
+CONFIG_SECURITY_SELINUX=y
+```
+
+### General
+```
+CONFIG_AUDIT=y
+CONFIG_EPOLL=y
+CONFIG_SIGNALFD=y
+CONFIG_TIMERFD=y
+CONFIG_EVENTFD=y
+CONFIG_SHMEM=y
+CONFIG_TMPFS=y
+CONFIG_TMPFS_POSIX_ACL=y
+CONFIG_DEVTMPFS=y
+CONFIG_DEVTMPFS_MOUNT=y
+```
+
+## 3. Boot Image Configuration
 `BoardConfig.mk` is currently configured to use `exynos7870_j7xelte_defconfig`.
 
 Once you have a working kernel build, you may need to update `BoardConfig.mk` with the correct `BOARD_MKBOOTIMG_ARGS`.

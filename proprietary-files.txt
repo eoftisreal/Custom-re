@@ -1,5 +1,5 @@
 # Proprietary files for Samsung Galaxy J7 (2016)
-# Based on LineageOS 18.1 for Exynos 7870 devices
+# Based on LineageOS 19.1 for Exynos 7870 devices
 
 # Audio
 lib/libaudioroute.so
@@ -129,3 +129,19 @@ vendor/lib/libgps.so
 vendor/bin/gpsd
 vendor/lib64/libgnss.so
 vendor/lib64/libgps.so
+
+# Shim libraries for Android 12 blob compatibility
+vendor/lib/libshim_camera.so
+vendor/lib64/libshim_camera.so
+vendor/lib/libshim_ril.so
+vendor/lib64/libshim_ril.so
+
+# Keymaster / Gatekeeper
+vendor/lib/hw/keystore.exynos7870.so
+vendor/lib64/hw/keystore.exynos7870.so
+vendor/lib/hw/gatekeeper.exynos7870.so
+vendor/lib64/hw/gatekeeper.exynos7870.so
+
+# Health HAL
+vendor/lib/hw/android.hardware.health@2.1-impl.so
+vendor/lib64/hw/android.hardware.health@2.1-impl.so
