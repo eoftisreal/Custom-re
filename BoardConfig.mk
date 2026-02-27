@@ -33,6 +33,22 @@ TARGET_KERNEL_HEADER_VERSION := 0
 TARGET_KERNEL_SOURCE := kernel/samsung/exynos7870
 TARGET_KERNEL_CONFIG := exynos7870_j7xelte_defconfig
 
+# External USB WiFi (RTL8192EU) - Kernel config requirements
+# These flags must be set in the kernel defconfig (exynos7870_j7xelte_defconfig):
+#   CONFIG_USB_SUPPORT=y
+#   CONFIG_USB=y
+#   CONFIG_USB_OTG=y
+#   CONFIG_USB_EHCI_HCD=y
+#   CONFIG_USB_NET_DRIVERS=y
+#   CONFIG_CFG80211=y
+#   CONFIG_MAC80211=y
+#   CONFIG_NET_RADIO=y
+#   CONFIG_PACKET=y
+#   CONFIG_CFG80211_WEXT=y
+#   CONFIG_MODULES=y
+#   CONFIG_MODULE_UNLOAD=y
+#   CONFIG_MODVERSIONS=y
+
 # Partitions
 BOARD_FLASH_BLOCK_SIZE := 131072 # (BOARD_KERNEL_PAGESIZE * 64)
 BOARD_BOOTIMAGE_PARTITION_SIZE := 33554432
