@@ -69,4 +69,16 @@
     <!-- Whether the Enhanced 4G LTE toggle is editable -->
     <bool name="config_editable_enhanced_4g_lte">true</bool>
 
+    <!-- Modern UI: Allow full-screen gesture navigation if supported -->
+    <bool name="config_swipe_up_gesture_setting_available">true</bool>
+
+    <!-- Modern UI: Enable smooth display dimming transitions -->
+    <bool name="config_animateScreenLights">true</bool>
+
+    <!-- Modern UI: Notification LED - disable for modern ambient-display approach -->
+    <bool name="config_intrusiveNotificationLed">false</bool>
+
+    <!-- Optimize: Use dark mode for battery savings on AMOLED -->
+    <integer name="config_defaultNightMode">2</integer>
+
 </resources>
