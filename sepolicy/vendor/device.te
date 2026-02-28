@@ -25,6 +25,8 @@ allow camera_vendor ion_device:chr_file rw_file_perms;
 type sysfs_front_flash, fs_type, sysfs_type;
 allow camera_vendor sysfs_front_flash:dir search;
 allow camera_vendor sysfs_front_flash:file rw_file_perms;
+allow hal_camera_default sysfs_front_flash:dir search;
+allow hal_camera_default sysfs_front_flash:file rw_file_perms;
 allow system_server sysfs_front_flash:dir search;
 allow system_server sysfs_front_flash:file rw_file_perms;
 

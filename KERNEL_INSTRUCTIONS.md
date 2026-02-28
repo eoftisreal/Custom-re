@@ -69,7 +69,7 @@ Example (Verify with your device!):
 BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x01000000 --tags_offset 0x00000100 --dt_dir $(OUT)/obj/KERNEL_OBJ/arch/arm64/boot/dts
 ```
 
-## 3. RTL8192EU USB WiFi Driver (TP-Link TL-WN823N)
+## 4. RTL8192EU USB WiFi Driver (TP-Link TL-WN823N)
 
 This device tree includes support for loading the RTL8192EU out-of-tree kernel module (`8192eu.ko`) for external USB WiFi via TP-Link TL-WN823N (v2/v3).
 
