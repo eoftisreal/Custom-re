@@ -30,6 +30,12 @@ on boot
     chown system system /sys/class/backlight/panel/brightness
     chmod 0660 /sys/class/backlight/panel/brightness
 
+    # Front flash LED (Samsung front camera LED via sysfs)
+    chown system camera /sys/class/leds/front_flash/brightness
+    chmod 0664 /sys/class/leds/front_flash/brightness
+    chown system camera /sys/class/leds/front_flash/max_brightness
+    chmod 0444 /sys/class/leds/front_flash/max_brightness
+
     # CPU governor tuning (schedutil for Exynos 7870)
     write /sys/devices/system/cpu/cpufreq/policy0/scaling_governor schedutil
     write /sys/devices/system/cpu/cpufreq/policy0/schedutil/up_rate_limit_us 500

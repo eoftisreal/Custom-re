@@ -81,4 +81,10 @@
     <!-- Optimize: Use dark mode for battery savings on AMOLED -->
     <integer name="config_defaultNightMode">2</integer>
 
+    <!-- Front flash LED: Enable hardware flash for front camera -->
+    <bool name="config_hasFlashLight">true</bool>
+
+    <!-- Front flash LED: Proximity sensor timeout (ms) to disable flash -->
+    <integer name="config_flashlightProximityTimeout">300</integer>
+
 </resources>

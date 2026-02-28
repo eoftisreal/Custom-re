@@ -21,6 +21,13 @@ allow camera_vendor hwbinder_device:chr_file rw_file_perms;
 allow camera_vendor hwservicemanager:binder { call transfer };
 allow camera_vendor ion_device:chr_file rw_file_perms;
 
+# Front flash LED sysfs access
+type sysfs_front_flash, fs_type, sysfs_type;
+allow camera_vendor sysfs_front_flash:dir search;
+allow camera_vendor sysfs_front_flash:file rw_file_perms;
+allow system_server sysfs_front_flash:dir search;
+allow system_server sysfs_front_flash:file rw_file_perms;
+
 # Sensors HAL
 type sensors_vendor, domain;
 type sensors_vendor_exec, exec_type, vendor_file_type, file_type;

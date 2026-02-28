@@ -42,3 +42,7 @@
 
 # ION device
 /dev/ion                                              u:object_r:ion_device:s0
+
+# Front flash LED sysfs
+/sys/class/leds/front_flash(/.*)?                     u:object_r:sysfs_front_flash:s0
+/sys/devices/[a-f0-9]+\.leds/leds/front_flash(/.*)?   u:object_r:sysfs_front_flash:s0
