@@ -70,7 +70,12 @@ TARGET_KERNEL_CONFIG := exynos7870_j7xelte_defconfig
 #   CONFIG_HIGH_RES_TIMERS=y           (precise timer support)
 #   CONFIG_PREEMPT=y                   (preemptive kernel for reduced latency)
 #   CONFIG_DEBUG_KERNEL=n              (disable debug overhead in production)
+#   CONFIG_DEBUG_INFO=n                (disable debug symbols to reduce kernel size)
 #   CONFIG_PRINTK=y                    (keep printk but reduce log level at boot)
+#   CONFIG_NO_HZ=y                     (tickless kernel)
+#   CONFIG_NO_HZ_IDLE=y                (tickless idle for power savings)
+#   CONFIG_IRQ_FORCED_THREADING=y      (threaded IRQ for balanced IRQ handling)
+#   CONFIG_SCHED_MC=y                  (multi-core aware scheduler)
 
 # Namespace / container support (chroot, proot, NetHunter):
 #   CONFIG_NAMESPACES=y
