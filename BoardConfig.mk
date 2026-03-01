@@ -65,6 +65,31 @@ TARGET_KERNEL_CONFIG := exynos7870_j7xelte_defconfig
 #   CONFIG_MODULE_UNLOAD=y
 #   CONFIG_MODVERSIONS=y
 
+# Kernel stability and performance baseline:
+#   CONFIG_HIGH_RES_TIMERS=y           (precise timer support)
+#   CONFIG_PREEMPT=y                   (preemptive kernel for reduced latency)
+#   CONFIG_DEBUG_KERNEL=n              (disable debug overhead in production)
+#   CONFIG_PRINTK=y                    (keep printk but reduce log level at boot)
+
+# Namespace / container support (chroot, proot, NetHunter):
+#   CONFIG_NAMESPACES=y
+#   CONFIG_UTS_NS=y
+#   CONFIG_PID_NS=y
+#   CONFIG_NET_NS=y
+#   CONFIG_IPC_NS=y
+#   CONFIG_USER_NS=y
+#   CONFIG_MNT_NS=y                    (mount namespace isolation)
+#   CONFIG_BLK_DEV_LOOP=y              (loop device for disk images)
+#   CONFIG_SQUASHFS=y                  (SquashFS for container rootfs)
+#   CONFIG_SQUASHFS_XZ=y
+#   CONFIG_SQUASHFS_LZO=y
+#   CONFIG_EXT4_FS=y
+#   CONFIG_FUSE_FS=y                   (FUSE for userspace filesystems)
+#   CONFIG_DEVPTS_MULTIPLE_INSTANCES=y (multiple /dev/pts mounts)
+#   CONFIG_TMPFS=y
+#   CONFIG_PROC_FS=y
+#   CONFIG_SYSFS=y
+
 # Security hardening - Kernel config requirements:
 #   CONFIG_CC_STACKPROTECTOR_STRONG=y  (stack canaries)
 #   CONFIG_HARDENED_USERCOPY=y         (hardened usercopy)
@@ -74,6 +99,34 @@ TARGET_KERNEL_CONFIG := exynos7870_j7xelte_defconfig
 #   CONFIG_PAGE_TABLE_ISOLATION=y      (Spectre v2 mitigation, if available)
 #   CONFIG_SECCOMP=y                   (syscall filtering)
 #   CONFIG_SECCOMP_FILTER=y
+
+# NetHunter / USB attack surface - Kernel config requirements:
+#   CONFIG_USB_GADGET=y
+#   CONFIG_USB_CONFIGFS=y
+#   CONFIG_USB_CONFIGFS_RNDIS=y        (USB tethering / RNDIS gadget)
+#   CONFIG_USB_CONFIGFS_ECM=y          (Ethernet Control Model)
+#   CONFIG_USB_CONFIGFS_ACM=y          (serial gadget)
+#   CONFIG_USB_CONFIGFS_MASS_STORAGE=y
+#   CONFIG_USB_F_HID=y                 (HID gadget for keyboard emulation)
+#   CONFIG_USB_CONFIGFS_F_HID=y
+#   CONFIG_HID=y
+#   CONFIG_HIDRAW=y
+#   CONFIG_USB_HIDDEV=y
+
+# Netfilter / networking (security research):
+#   CONFIG_NETFILTER=y
+#   CONFIG_NETFILTER_ADVANCED=y
+#   CONFIG_NF_CONNTRACK=y
+#   CONFIG_NF_NAT=y
+#   CONFIG_IP_NF_IPTABLES=y
+#   CONFIG_IP_NF_FILTER=y
+#   CONFIG_IP_NF_NAT=y
+#   CONFIG_IP_NF_MANGLE=y
+#   CONFIG_IP_NF_RAW=y
+#   CONFIG_IP6_NF_IPTABLES=y
+#   CONFIG_BRIDGE_NETFILTER=y
+#   CONFIG_TUN=y                       (VPN/tunnel support)
+#   CONFIG_VETH=y                      (virtual ethernet for containers)
 
 # Partitions
 BOARD_FLASH_BLOCK_SIZE := 131072 # (BOARD_KERNEL_PAGESIZE * 64)

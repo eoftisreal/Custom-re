@@ -46,3 +46,9 @@
 # Front flash LED sysfs
 /sys/class/leds/front_flash(/.*)?                     u:object_r:sysfs_front_flash:s0
 /sys/devices/[a-f0-9]+\.leds/leds/front_flash(/.*)?   u:object_r:sysfs_front_flash:s0
+
+# NetHunter / research tool devices
+/dev/hidg[0-9]*                                       u:object_r:hidg_device:s0
+/dev/tun                                              u:object_r:tun_device:s0
+/dev/loop[0-9]*                                       u:object_r:loop_device:s0
+/data/local/nhsystem(/.*)?                            u:object_r:research_tool_exec:s0

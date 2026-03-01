@@ -43,12 +43,21 @@ The project aims to provide a stable, vanilla (GApps-free) Android experience op
 *   **VNDK:** Current version enforced
 
 ### Memory & Performance Optimization
-*   **ZRAM:** 1GB compressed swap via LZ4
-*   **LMKD:** Aggressively tuned for 2GB RAM
-*   **Background apps:** Limited to 20
+*   **ZRAM:** 1.5GB compressed swap via LZ4 (75% of RAM for research workloads)
+*   **LMKD:** Aggressively tuned for 2GB RAM with vmpressure-based monitoring
+*   **Background apps:** Limited to 24
 *   **CPU Governor:** schedutil
 *   **Animation scales:** Reduced to 0.5x for snappier UI
-*   **I/O Scheduler:** CFQ with 512KB read-ahead
+*   **I/O Scheduler:** CFQ with 1024KB read-ahead, 128 request queue
+*   **VM tuning:** dirty_ratio=20, dirty_background_ratio=5, swappiness=100
+
+### Security Research & NetHunter Support
+*   **Chroot/proot containers:** Full namespace support (PID, NET, UTS, IPC, USER, MNT)
+*   **USB OTG:** Autosuspend disabled, stable host stack for research hardware
+*   **USB gadgets:** HID, RNDIS, ECM, ACM, mass storage for NetHunter attacks
+*   **Network stack:** Tuned rmem/wmem buffers, expanded conntrack table, netfilter support
+*   **SELinux:** Dedicated `research_tool` domain — avoids global permissive mode
+*   **Thermal management:** Logging reduced, governor tuned for sustained workloads
 
 ### Security
 *   **SELinux:** Enforcing mode (required by Android 12, no permissive fallback)

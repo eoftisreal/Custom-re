@@ -61,6 +61,7 @@ ro.lmk.swap_free_low_percentage=10
 ro.lmk.swap_util_max=90
 ro.lmk.thrashing_limit=30
 ro.lmk.thrashing_limit_decay=50
+ro.lmk.psi_complete_stall_ms=700
 
 # ZRAM / compressed swap for low-memory device
 ro.zram.mark_idle_delay_mins=60
@@ -90,3 +91,8 @@ persist.camera.HAL3.enabled=1
 # Bluetooth - Device name and LE compatibility
 bluetooth.device.default_name=Galaxy J7 2016
 bluetooth.le.disable_apcf_extended_features=1
+
+# USB gadget configuration for NetHunter
+sys.usb.configfs=1
+sys.usb.ffs.ready=0
+sys.usb.controller=13600000.dwc3

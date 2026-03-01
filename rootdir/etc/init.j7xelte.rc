@@ -15,13 +15,20 @@ on fs
     mount_all /vendor/etc/fstab.exynos7870
 
 on post-fs
-    # ZRAM setup for 2GB RAM device
+    # ZRAM setup for 2GB RAM device -- 1.5GB (75% of RAM) for research workloads
     # Note: Must run after mount_all so /system/bin/mkswap is available
     write /sys/block/zram0/comp_algorithm lz4
     write /sys/block/zram0/max_comp_streams 4
-    write /sys/block/zram0/disksize 1073741824
+    write /sys/block/zram0/disksize 1610612736
     exec u:r:init:s0 -- /system/bin/mkswap /dev/block/zram0
     exec u:r:init:s0 -- /system/bin/swapon /dev/block/zram0
+
+    # Virtual memory tuning for I/O-heavy research workloads
+    write /proc/sys/vm/dirty_ratio 20
+    write /proc/sys/vm/dirty_background_ratio 5
+    write /proc/sys/vm/vfs_cache_pressure 100
+    write /proc/sys/vm/swappiness 80
+    write /proc/sys/vm/overcommit_memory 1
 
 on post-fs-data
     # Create directory for EFS
@@ -45,10 +52,32 @@ on boot
 
     # I/O scheduler optimization
     write /sys/block/mmcblk0/queue/scheduler cfq
-    write /sys/block/mmcblk0/queue/read_ahead_kb 512
+    write /sys/block/mmcblk0/queue/read_ahead_kb 1024
+    write /sys/block/mmcblk0/queue/nr_requests 128
+
+    # USB OTG stability — disable aggressive autosuspend
+    write /sys/module/usbcore/parameters/autosuspend -1
+    write /sys/bus/usb/devices/usb1/power/control on
+    write /sys/bus/usb/devices/usb2/power/control on
+
+    # Network stack tuning for security research workloads
+    write /proc/sys/net/core/rmem_max 8388608
+    write /proc/sys/net/core/wmem_max 8388608
+    write /proc/sys/net/core/rmem_default 1048576
+    write /proc/sys/net/core/wmem_default 1048576
+    write /proc/sys/net/ipv4/tcp_rmem "4096 1048576 8388608"
+    write /proc/sys/net/ipv4/tcp_wmem "4096 1048576 8388608"
+    write /proc/sys/net/netfilter/nf_conntrack_max 65536
+
+    # Reduce excessive kernel logging for performance
+    write /proc/sys/kernel/printk "4 4 1 4"
 
     # Load RTL8192EU USB WiFi driver module if present
     insmod /vendor/lib/modules/8192eu.ko
+
+    # NetHunter: Ensure /dev/hidg0 HID gadget is accessible to research tools
+    chown system system /dev/hidg0
+    chmod 0660 /dev/hidg0
 
 service ril-daemon /vendor/bin/hw/rild
     class main

@@ -60,3 +60,32 @@ allow graphics_vendor hwbinder_device:chr_file rw_file_perms;
 allow graphics_vendor hwservicemanager:binder { call transfer };
 allow graphics_vendor gpu_device:chr_file rw_file_perms;
 allow graphics_vendor ion_device:chr_file rw_file_perms;
+
+# Research / NetHunter tool domain
+# Isolated domain for security research tools running in chroot/proot containers.
+# Avoids global permissive mode by confining research tools to a dedicated domain.
+type research_tool, domain;
+type research_tool_exec, exec_type, file_type;
+
+# Allow research tools to use network namespaces and raw sockets
+allow research_tool self:capability { net_raw net_admin };
+allow research_tool self:rawip_socket { create getopt setopt read write };
+allow research_tool self:packet_socket { create bind getopt setopt read write };
+allow research_tool self:netlink_route_socket { create bind getattr read write nlmsg_read nlmsg_write };
+
+# Allow mount operations for chroot environments
+# Note: mknod is required for populating /dev inside chroot containers
+allow research_tool self:capability { sys_chroot sys_resource mknod };
+allow research_tool tmpfs:filesystem mount;
+allow research_tool proc:filesystem mount;
+allow research_tool sysfs:filesystem mount;
+allow research_tool devpts:filesystem mount;
+
+# Allow loop device access for disk image mounting
+allow research_tool loop_device:blk_file rw_file_perms;
+
+# Allow access to /dev/tun for VPN operations
+allow research_tool tun_device:chr_file rw_file_perms;
+
+# USB HID gadget access for NetHunter
+allow research_tool hidg_device:chr_file rw_file_perms;
