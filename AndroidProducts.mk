@@ -1,7 +1,7 @@
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/lineage_j7xelte.mk
+    $(LOCAL_DIR)/coinos_j7xelte.mk
 
 COMMON_LUNCH_CHOICES := \
-    lineage_j7xelte-user \
-    lineage_j7xelte-userdebug \
-    lineage_j7xelte-eng
+    coinos_j7xelte-user \
+    coinos_j7xelte-userdebug \
+    coinos_j7xelte-eng
