@@ -61,3 +61,17 @@
 
 # USB configfs for NetHunter gadget management
 /config/usb_gadget(/.*)?                              u:object_r:configfs:s0
+
+# Thermal HAL
+/vendor/bin/hw/android\.hardware\.thermal@2\.0-service   u:object_r:thermal_hal_exec:s0
+
+# Health HAL
+/vendor/bin/hw/android\.hardware\.health@2\.1-service    u:object_r:health_hal_exec:s0
+
+# Thermal zone sysfs
+/sys/class/thermal(/.*)?                              u:object_r:sysfs_thermal:s0
+/sys/devices/virtual/thermal(/.*)?                    u:object_r:sysfs_thermal:s0
+
+# Battery / power supply sysfs
+/sys/class/power_supply(/.*)?                         u:object_r:sysfs_batteryinfo:s0
+/sys/devices/platform/.+/power_supply(/.*)?           u:object_r:sysfs_batteryinfo:s0

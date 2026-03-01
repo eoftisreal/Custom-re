@@ -21,7 +21,7 @@ TARGET_BOARD_PLATFORM := exynos7870
 TARGET_SOC := exynos7870
 
 # Kernel
-BOARD_KERNEL_CMDLINE := console=ttySAC2,115200 androidboot.hardware=exynos7870
+BOARD_KERNEL_CMDLINE := console=ttySAC2,115200 androidboot.hardware=exynos7870 androidboot.selinux=enforcing
 BOARD_KERNEL_BASE := 0x10000000
 BOARD_KERNEL_PAGESIZE := 2048
 BOARD_KERNEL_OFFSET := 0x00008000
@@ -187,6 +187,9 @@ BOARD_SYSTEMIMAGE_FILE_SYSTEM_TYPE := ext4
 # Vendor partition
 BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
 TARGET_COPY_OUT_VENDOR := vendor
+
+# Memory optimization — enable svelte malloc for 2GB RAM
+MALLOC_SVELTE := true
 
 # System as root
 BOARD_BUILD_SYSTEM_ROOT_IMAGE := false
