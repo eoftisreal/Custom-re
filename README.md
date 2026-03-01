@@ -38,19 +38,20 @@ The project aims to provide a stable, vanilla (GApps-free) Android experience op
 
 ### Storage & Partitions
 *   **Partition Scheme:** Treble-compatible (system/vendor split)
-*   **File Systems:** EXT4 for System, Vendor, Userdata, Cache
+*   **File Systems:** EXT4 for System, Vendor, Userdata, Cache; F2FS also supported
 *   **Encryption:** Full Disk Encryption (FDE) support enabled via footer
 *   **VNDK:** Current version enforced
+*   **SQLite:** WAL journal mode for improved concurrent I/O
 
 ### Memory & Performance Optimization
 *   **ZRAM:** 1.5GB compressed swap via LZ4 (75% of RAM for research workloads)
 *   **KSM:** Kernel Same-page Merging enabled for memory deduplication
 *   **LMKD:** Aggressively tuned for 2GB RAM with vmpressure-based monitoring
 *   **Background apps:** Limited to 24
-*   **CPU Governor:** schedutil with tuned rate limits (500µs up / 10ms down after boot)
+*   **CPU Governor:** schedutil with tuned rate limits (1ms up / 20ms down at boot, 10ms down post-boot for faster thermal response)
 *   **Animation scales:** Reduced to 0.5x for snappier UI
-*   **I/O Scheduler:** CFQ at boot → deadline post-boot, 2048KB→1024KB readahead transition
-*   **VM tuning:** dirty_ratio=20, dirty_background_ratio=5, swappiness=80, page-cluster=0
+*   **I/O Scheduler:** CFQ at boot → deadline post-boot, 2048KB→512KB readahead transition
+*   **VM tuning:** dirty_ratio=15, dirty_background_ratio=5, swappiness=60, page-cluster=0
 *   **ART:** Profile-guided JIT, speed-compiled system_server, dex2oat memory-bounded
 *   **Kernel scheduler:** Tuned sched_latency, min_granularity, wakeup_granularity, migration_cost
 *   **Post-boot:** Cache drop on boot_completed, scheduler switch, readahead reduction
@@ -70,19 +71,75 @@ The project aims to provide a stable, vanilla (GApps-free) Android experience op
 *   **Thermal management:** Logging reduced, governor tuned for sustained workloads
 *   **NetHunter chroot:** Directories pre-created at /data/local/nhsystem
 
+### External USB WiFi (RTL8192EU)
+*   **Adapter:** TP-Link TL-WN823N (v2/v3) via USB OTG
+*   **Driver:** rtl8192eu out-of-tree kernel module (`8192eu.ko`), loaded at boot via init script
+*   **Monitor mode / Packet injection:** Supported with aircrack-ng patched driver fork
+*   **Integration:** Module placed in `vendor/lib/modules/`, auto-loaded by `init.j7xelte.rc`
+*   See [`USB_WIFI_SETUP.md`](USB_WIFI_SETUP.md) for the full integration guide
+
+### HIDL HAL Interfaces
+Declared in `manifest.xml`:
+*   Audio 6.0, Audio Effect 6.0
+*   Bluetooth 1.0
+*   Camera Provider 2.4 (HAL3 enabled via `persist.camera.HAL3.enabled=1`)
+*   DRM 1.3 (CryptoFactory, DrmFactory)
+*   GNSS 1.0
+*   Graphics: Allocator 2.0, Composer 2.1, Mapper 2.0
+*   Keymaster 4.0, Gatekeeper 1.0
+*   Sensors 1.0
+*   WiFi 1.0, Supplicant 1.0, Hostapd 1.0
+*   Health 2.1
+
+### Graphics & Rendering
+*   **GPU Composition:** Prefer GPU over HWC for stability on Mali-T830
+*   **Renderer:** SkiaGL threaded backend with render-ahead=2
+*   **HWUI cache:** Tuned for 2GB RAM (texture=24MB, layer=16MB, path=4MB)
+*   **SurfaceFlinger:** Color management enabled, max 3 acquired frame buffers
+
+### Telephony & IMS
+*   **RIL:** Samsung Exynos 7870 RIL with power collapse support
+*   **VoLTE/VT/WFC:** Enabled via IMS properties and overlay config
+*   **IMS daemon:** Starts after RIL connection for VoLTE/VT registration
+
 ### Security
 *   **SELinux:** Enforcing mode (required by Android 12, no permissive fallback)
+*   **ASLR:** Full randomization (`randomize_va_space=2`)
+*   **Kernel hardening:** Stack protector (strong), hardened usercopy, FORTIFY_SOURCE, SECCOMP filter
 *   **Signing:** Test keys are used for development builds. Release builds will require private keys.
+
+### Overlay Customizations
+*   Gesture navigation enabled by default
+*   WiFi MAC address randomization enabled
+*   Animation scales reduced to 0.5x for snappier UI on low-end hardware
+*   Quick Settings: 2 columns, max 4 notification icons
+
+## Additional Documentation
+
+*   [`KERNEL_INSTRUCTIONS.md`](KERNEL_INSTRUCTIONS.md) — Kernel config requirements, boot image configuration, and RTL8192EU driver build instructions
+*   [`USB_WIFI_SETUP.md`](USB_WIFI_SETUP.md) — Full external USB WiFi integration guide (hardware, driver selection, monitor mode, known issues)
 
 ## Directory Structure
 
 The project follows the standard Android build system hierarchy:
 
 *   **`device/samsung/j7xelte/`**: The core device configuration.
+    *   `AndroidProducts.mk`: Declares the product makefile for the build system.
     *   `BoardConfig.mk`: Defines hardware architecture, partition sizes, kernel flags, and VNDK configuration.
     *   `coin_j7xelte.mk`: The product makefile that inherits CoinOS common configurations.
+    *   `device.mk`: Hardware permissions, memory optimization properties, overlay, and init script packaging.
+    *   `system.prop`: System properties for RIL, IMS, graphics, Dalvik/ART, LMKD, and TCP tuning.
+    *   `manifest.xml`: HIDL HAL interface declarations for the device.
+    *   `compatibility_matrix.xml`: Required HIDL interfaces (binder manager, memory allocator).
+    *   `recovery.fstab`: Partition table for recovery mode (includes external SD card).
+    *   `coin.dependencies`: JSON file listing external repos (kernel, vendor) for automatic dependency resolution.
+    *   `local_manifests_example.xml`: Example local manifest for repo sync.
+    *   `extract-files.sh`: Script to extract proprietary blobs from a device or backup.
+    *   `setup-makefiles.sh`: Generates vendor makefiles after blob extraction.
+    *   `proprietary-files.txt`: List of proprietary blobs (audio, Bluetooth, camera, graphics, RIL, IMS, sensors, WiFi, shim libraries).
     *   `rootdir/etc/`: Contains init scripts (`init.j7xelte.rc`) and partition tables (`fstab.exynos7870`).
-    *   `sepolicy/`: SELinux policy rules and file contexts for Android 12 enforcing mode.
+    *   `sepolicy/vendor/`: SELinux policy rules (`device.te`) and file contexts for Android 12 enforcing mode, including a dedicated `research_tool` domain for security research tools (raw sockets, configfs, USB gadgets).
+    *   `overlay/`: Framework resource overlays for SystemUI, SettingsProvider, and CoreServices.
 
 *   **`vendor/samsung/j7xelte/`**: Proprietary blobs extracted from stock firmware (GPU drivers, RIL, Camera HALs) and shim libraries. *Note: You must populate this yourself.*
 
@@ -96,12 +153,17 @@ Set up your local build environment with the necessary dependencies (repo, git, 
 ### 2. Sync Source
 ```bash
 repo init -u https://github.com/eoftisreal/android.git -b coin-1.0
-# Add local manifests if necessary
+# Add local manifests for device dependencies (see local_manifests_example.xml):
+# cp local_manifests_example.xml .repo/local_manifests/j7xelte.xml
 repo sync
 ```
 
+*Note: The `coin.dependencies` file can also be used by dependency resolvers to automatically fetch the kernel and vendor repos.*
+
 ### 3. Populate Vendor and Kernel
 Ensure the kernel source is placed in `kernel/samsung/exynos7870` and vendor blobs are extracted to `vendor/samsung/j7xelte`.
+
+See [`KERNEL_INSTRUCTIONS.md`](KERNEL_INSTRUCTIONS.md) for detailed kernel configuration requirements and boot image setup.
 
 Shim libraries (`libshim_camera.so`, `libshim_ril.so`) must be built and placed in the vendor directory to resolve symbol mismatches between legacy blobs and Android 12 libraries.
 
