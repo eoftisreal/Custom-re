@@ -60,7 +60,7 @@ The project follows the standard Android build system hierarchy:
 
 *   **`device/samsung/j7xelte/`**: The core device configuration.
     *   `BoardConfig.mk`: Defines hardware architecture, partition sizes, kernel flags, and VNDK configuration.
-    *   `coinos_j7xelte.mk`: The product makefile that inherits CoinOS common configurations.
+    *   `coin_j7xelte.mk`: The product makefile that inherits CoinOS common configurations.
     *   `rootdir/etc/`: Contains init scripts (`init.j7xelte.rc`) and partition tables (`fstab.exynos7870`).
     *   `sepolicy/`: SELinux policy rules and file contexts for Android 12 enforcing mode.
 
@@ -75,7 +75,7 @@ Set up your local build environment with the necessary dependencies (repo, git, 
 
 ### 2. Sync Source
 ```bash
-repo init -u https://github.com/CoinOS/android.git -b coinos-1.0
+repo init -u https://github.com/CoinOS/android.git -b coin-1.0
 # Add local manifests if necessary
 repo sync
 ```
@@ -88,7 +88,7 @@ Shim libraries (`libshim_camera.so`, `libshim_ril.so`) must be built and placed 
 ### 4. Build
 ```bash
 source build/envsetup.sh
-lunch coinos_j7xelte-userdebug
+lunch coin_j7xelte-userdebug
 mka bacon
 ```
 

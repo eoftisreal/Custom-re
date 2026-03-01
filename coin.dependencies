@@ -2,11 +2,11 @@
   {
     "repository": "android_kernel_samsung_exynos7870",
     "target_path": "kernel/samsung/exynos7870",
-    "branch": "lineage-19.1"
+    "branch": "coin-1.0"
   },
   {
     "repository": "android_vendor_samsung_j7xelte",
     "target_path": "vendor/samsung/j7xelte",
-    "branch": "lineage-19.1"
+    "branch": "coin-1.0"
   }
 ]
