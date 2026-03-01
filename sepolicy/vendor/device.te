@@ -135,21 +135,21 @@ allow research_tool self:capability { net_bind_service };
 # Thermal HAL domain — monitors SoC thermals for governor decisions
 type thermal_hal, domain;
 type thermal_hal_exec, exec_type, vendor_file_type, file_type;
+type sysfs_thermal, fs_type, sysfs_type;
 
 init_daemon_domain(thermal_hal)
 allow thermal_hal hwbinder_device:chr_file rw_file_perms;
 allow thermal_hal hwservicemanager:binder { call transfer };
-allow thermal_hal sysfs:dir { open read search };
-allow thermal_hal sysfs:file { read open getattr };
-allow thermal_hal sysfs_type:dir { open read search };
-allow thermal_hal sysfs_type:file { read open getattr };
+allow thermal_hal sysfs_thermal:dir { open read search };
+allow thermal_hal sysfs_thermal:file { read open getattr };
 
 # Health HAL domain — battery and charger status reporting
 type health_hal, domain;
 type health_hal_exec, exec_type, vendor_file_type, file_type;
+type sysfs_batteryinfo, fs_type, sysfs_type;
 
 init_daemon_domain(health_hal)
 allow health_hal hwbinder_device:chr_file rw_file_perms;
 allow health_hal hwservicemanager:binder { call transfer };
-allow health_hal sysfs:dir { open read search };
-allow health_hal sysfs:file { read open getattr };
+allow health_hal sysfs_batteryinfo:dir { open read search };
+allow health_hal sysfs_batteryinfo:file { read open getattr };
