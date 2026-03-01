@@ -28,7 +28,6 @@ vendor/lib64/hw/audio.primary.exynos7870.so
 vendor/lib64/hw/audio_policy.exynos7870.so
 
 # Bluetooth
-bin/libbt-vendor.so
 vendor/lib/libbt-vendor.so
 vendor/lib/hw/bluetooth.default.so
 vendor/etc/init/init.bluetooth.rc
@@ -82,7 +81,7 @@ vendor/lib64/libOmxVenc.so
 vendor/lib64/libomx_exynos_v4l2.so
 
 # RIL
-bin/rild
+vendor/bin/hw/rild
 lib/libril.so
 vendor/lib/libsec-ril.so
 vendor/lib/libsec-ril-dsds.so
