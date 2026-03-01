@@ -127,6 +127,29 @@ TARGET_KERNEL_CONFIG := exynos7870_j7xelte_defconfig
 #   CONFIG_BRIDGE_NETFILTER=y
 #   CONFIG_TUN=y                       (VPN/tunnel support)
 #   CONFIG_VETH=y                      (virtual ethernet for containers)
+#   CONFIG_BRIDGE=y                    (bridge device for containers)
+#   CONFIG_NF_CONNTRACK_FTP=y          (FTP connection tracking)
+#   CONFIG_NF_NAT_FTP=y
+
+# Performance / scheduler (max throughput):
+#   CONFIG_KSM=y                       (Kernel Same-page Merging — memory dedup)
+#   CONFIG_SCHED_MC=y                  (multi-core scheduler)
+#   CONFIG_NO_HZ=y                     (tickless kernel)
+#   CONFIG_CRC32_SLICEBY8=y            (fast CRC32 for eMMC)
+#   CONFIG_CRYPTO_CRC32C=y
+#   CONFIG_CRYPTO_SHA256=y             (hardware crypto accel)
+#   CONFIG_ARM64_CRYPTO=y
+#   CONFIG_CRYPTO_AES_ARM64_CE=y
+#   CONFIG_CRYPTO_SHA2_ARM64_CE=y
+
+# Wireless extensions for NetHunter (monitor mode/injection):
+#   CONFIG_WIRELESS_EXT=y
+#   CONFIG_WEXT_CORE=y
+#   CONFIG_WEXT_PROC=y
+#   CONFIG_WEXT_SPY=y
+#   CONFIG_WEXT_PRIV=y
+#   CONFIG_NL80211_TESTMODE=y
+#   CONFIG_RFKILL=y
 
 # Partitions
 BOARD_FLASH_BLOCK_SIZE := 131072 # (BOARD_KERNEL_PAGESIZE * 64)

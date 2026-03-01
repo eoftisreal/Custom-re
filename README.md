@@ -44,20 +44,31 @@ The project aims to provide a stable, vanilla (GApps-free) Android experience op
 
 ### Memory & Performance Optimization
 *   **ZRAM:** 1.5GB compressed swap via LZ4 (75% of RAM for research workloads)
+*   **KSM:** Kernel Same-page Merging enabled for memory deduplication
 *   **LMKD:** Aggressively tuned for 2GB RAM with vmpressure-based monitoring
 *   **Background apps:** Limited to 24
-*   **CPU Governor:** schedutil
+*   **CPU Governor:** schedutil with tuned rate limits (500µs up / 10ms down after boot)
 *   **Animation scales:** Reduced to 0.5x for snappier UI
-*   **I/O Scheduler:** CFQ with 1024KB read-ahead, 128 request queue
-*   **VM tuning:** dirty_ratio=20, dirty_background_ratio=5, swappiness=100
+*   **I/O Scheduler:** CFQ at boot → deadline post-boot, 2048KB→1024KB readahead transition
+*   **VM tuning:** dirty_ratio=20, dirty_background_ratio=5, swappiness=80, page-cluster=0
+*   **ART:** Profile-guided JIT, speed-compiled system_server, dex2oat memory-bounded
+*   **Kernel scheduler:** Tuned sched_latency, min_granularity, wakeup_granularity, migration_cost
+*   **Post-boot:** Cache drop on boot_completed, scheduler switch, readahead reduction
+*   **TCP:** cubic congestion, fastopen=3, tuned keepalive/fin timeouts
+*   **Entropy:** Optimized read/write wakeup thresholds for faster boot
+*   **EXT4:** journal_async_commit, commit=20 for reduced journal overhead
 
 ### Security Research & NetHunter Support
 *   **Chroot/proot containers:** Full namespace support (PID, NET, UTS, IPC, USER, MNT)
 *   **USB OTG:** Autosuspend disabled, stable host stack for research hardware
 *   **USB gadgets:** HID, RNDIS, ECM, ACM, mass storage for NetHunter attacks
-*   **Network stack:** Tuned rmem/wmem buffers, expanded conntrack table, netfilter support
-*   **SELinux:** Dedicated `research_tool` domain — avoids global permissive mode
+*   **USB configfs:** Full SELinux access for dynamic gadget configuration
+*   **Network stack:** 8MB rmem/wmem buffers, 65K conntrack, 5000 backlog, tuned keepalive
+*   **SELinux:** Dedicated `research_tool` domain with raw sockets, configfs, proc/sys access
+*   **Wireless:** Full WEXT support, monitor mode, rfkill, NL80211 testmode
+*   **Crypto:** ARM64 CE acceleration (AES, SHA2) for research tool performance
 *   **Thermal management:** Logging reduced, governor tuned for sustained workloads
+*   **NetHunter chroot:** Directories pre-created at /data/local/nhsystem
 
 ### Security
 *   **SELinux:** Enforcing mode (required by Android 12, no permissive fallback)

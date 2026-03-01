@@ -26,13 +26,25 @@ on post-fs
     # Virtual memory tuning for I/O-heavy research workloads
     write /proc/sys/vm/dirty_ratio 20
     write /proc/sys/vm/dirty_background_ratio 5
+    write /proc/sys/vm/dirty_expire_centisecs 200
+    write /proc/sys/vm/dirty_writeback_centisecs 500
     write /proc/sys/vm/vfs_cache_pressure 100
     write /proc/sys/vm/swappiness 80
     write /proc/sys/vm/overcommit_memory 1
+    write /proc/sys/vm/min_free_kbytes 8192
+    write /proc/sys/vm/extra_free_kbytes 24300
+    write /proc/sys/vm/page-cluster 0
+
+    # ASLR hardening — full randomization
+    write /proc/sys/kernel/randomize_va_space 2
 
 on post-fs-data
     # Create directory for EFS
     mkdir /efs 0771 radio system
+
+    # NetHunter chroot directories
+    mkdir /data/local/nhsystem 0755 root root
+    mkdir /data/local/nhsystem/kali-armhf 0755 root root
 
 on boot
     # Permissions
@@ -50,10 +62,34 @@ on boot
     write /sys/devices/system/cpu/cpufreq/policy0/schedutil/up_rate_limit_us 500
     write /sys/devices/system/cpu/cpufreq/policy0/schedutil/down_rate_limit_us 20000
 
-    # I/O scheduler optimization
+    # Kernel scheduler tuning for maximum throughput
+    write /proc/sys/kernel/sched_latency_ns 10000000
+    write /proc/sys/kernel/sched_min_granularity_ns 1500000
+    write /proc/sys/kernel/sched_wakeup_granularity_ns 3000000
+    write /proc/sys/kernel/sched_migration_cost_ns 500000
+    write /proc/sys/kernel/sched_child_runs_first 0
+    write /proc/sys/kernel/sched_tunable_scaling 0
+
+    # I/O scheduler optimization — maximum throughput for eMMC
     write /sys/block/mmcblk0/queue/scheduler cfq
-    write /sys/block/mmcblk0/queue/read_ahead_kb 1024
+    write /sys/block/mmcblk0/queue/read_ahead_kb 2048
     write /sys/block/mmcblk0/queue/nr_requests 128
+    write /sys/block/mmcblk0/queue/iostats 0
+    write /sys/block/mmcblk0/queue/add_random 0
+    write /sys/block/mmcblk0/queue/rq_affinity 1
+    write /sys/block/mmcblk0/queue/nomerges 0
+    # Boot partition readahead
+    write /sys/block/mmcblk0boot0/queue/read_ahead_kb 2048
+    write /sys/block/mmcblk0boot1/queue/read_ahead_kb 2048
+
+    # Entropy optimization — use urandom for faster boot
+    write /proc/sys/kernel/random/read_wakeup_threshold 64
+    write /proc/sys/kernel/random/write_wakeup_threshold 896
+
+    # KSM (Kernel Same-page Merging) — deduplicate memory pages
+    write /sys/kernel/mm/ksm/run 1
+    write /sys/kernel/mm/ksm/sleep_millisecs 500
+    write /sys/kernel/mm/ksm/pages_to_scan 100
 
     # USB OTG stability — disable aggressive autosuspend
     write /sys/module/usbcore/parameters/autosuspend -1
@@ -65,9 +101,25 @@ on boot
     write /proc/sys/net/core/wmem_max 8388608
     write /proc/sys/net/core/rmem_default 1048576
     write /proc/sys/net/core/wmem_default 1048576
+    write /proc/sys/net/core/netdev_max_backlog 5000
+    write /proc/sys/net/core/somaxconn 1024
     write /proc/sys/net/ipv4/tcp_rmem "4096 1048576 8388608"
     write /proc/sys/net/ipv4/tcp_wmem "4096 1048576 8388608"
+    write /proc/sys/net/ipv4/tcp_max_syn_backlog 4096
+    write /proc/sys/net/ipv4/tcp_fin_timeout 15
+    write /proc/sys/net/ipv4/tcp_keepalive_time 300
+    write /proc/sys/net/ipv4/tcp_keepalive_probes 5
+    write /proc/sys/net/ipv4/tcp_keepalive_intvl 15
     write /proc/sys/net/netfilter/nf_conntrack_max 65536
+    write /proc/sys/net/ipv4/ip_local_port_range "1024 65535"
+
+    # TCP optimization — kernel sysctl
+    write /proc/sys/net/ipv4/tcp_congestion_control cubic
+    write /proc/sys/net/ipv4/tcp_fastopen 3
+    write /proc/sys/net/ipv4/tcp_ecn 0
+    write /proc/sys/net/ipv4/tcp_timestamps 1
+    write /proc/sys/net/ipv4/tcp_sack 1
+    write /proc/sys/net/ipv4/tcp_window_scaling 1
 
     # Reduce excessive kernel logging for performance
     write /proc/sys/kernel/printk "4 4 1 4"
@@ -78,6 +130,22 @@ on boot
     # NetHunter: Ensure /dev/hidg0 HID gadget is accessible to research tools
     chown system system /dev/hidg0
     chmod 0660 /dev/hidg0
+
+# Post-boot optimization — runs after boot animation completes
+on property:sys.boot_completed=1
+    # Drop page cache to reclaim memory after boot (dentries/inodes preserved)
+    write /proc/sys/vm/drop_caches 1
+
+    # Reduce readahead after boot for steady-state efficiency
+    write /sys/block/mmcblk0/queue/read_ahead_kb 1024
+
+    # Set I/O scheduler to deadline for steady-state
+    # CFQ provides fairness during boot (many concurrent processes); deadline provides
+    # lower latency for steady-state single-user workloads and research tools.
+    write /sys/block/mmcblk0/queue/scheduler deadline
+
+    # Final thermal — slightly relax governor for sustained performance
+    write /sys/devices/system/cpu/cpufreq/policy0/schedutil/down_rate_limit_us 10000
 
 service ril-daemon /vendor/bin/hw/rild
     class main

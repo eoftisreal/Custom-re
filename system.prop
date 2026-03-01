@@ -34,19 +34,34 @@ debug.egl.hw=1
 debug.hwui.renderer=skiagl
 ro.surface_flinger.max_frame_buffer_acquired_buffers=3
 ro.hwui.render_ahead=2
+debug.renderengine.backend=skiaglthreaded
+debug.hwui.use_hint_manager=true
+debug.hwui.target_cpu_time_percent=30
+
+# GPU composition — prefer GPU over HWC for stability on Mali-T830
+debug.sf.disable_hwc_overlays=0
+debug.composition.type=gpu
+debug.sf.enable_gl_backpressure=1
+
+# Disable debug tracing for max runtime performance
+debug.atrace.tags.enableflags=0
+persist.traced.enable=0
 
 # WiFi
 wifi.interface=wlan0
 
-# Dalvik - Tuned for 2GB RAM
+# Dalvik - Aggressively tuned for 2GB RAM
 dalvik.vm.heapstartsize=8m
 dalvik.vm.heapgrowthlimit=192m
 dalvik.vm.heapsize=512m
-dalvik.vm.heaptargetutilization=0.70
-dalvik.vm.heapminfree=2m
+dalvik.vm.heaptargetutilization=0.75
+dalvik.vm.heapminfree=1m
 dalvik.vm.heapmaxfree=8m
 dalvik.vm.dex2oat-threads=4
 dalvik.vm.image-dex2oat-threads=4
+dalvik.vm.dex2oat-swap=false
+dalvik.vm.dex2oat-Xms=64m
+dalvik.vm.dex2oat-Xmx=256m
 
 # Background Process Management
 persist.device_config.runtime_native.usap_pool_enabled=true
@@ -74,16 +89,29 @@ persist.sys.cpufreq.default_governor=schedutil
 # I/O scheduler
 ro.sys.fw.use_trim=true
 
+# SQLite optimization — WAL journal for improved concurrent I/O
+db.log.slow_query_threshold=0
+persist.sys.sqlite.journalmode=WAL
+
 # Android 12 specific
 persist.sys.usb.config=mtp,adb
 ro.surface_flinger.use_color_management=true
 
+# TCP optimization — cubic congestion control and TCP fastopen
+# Note: Kernel-level TCP tuning is in init.j7xelte.rc via /proc/sys writes.
+# These properties are for userspace reference only.
+persist.net.tcp.default_init_rwnd=60
+
 # ART - Profile-guided compilation for faster app launch (Android 12)
 dalvik.vm.usejit=true
+dalvik.vm.usejitprofiles=true
 pm.dexopt.install=speed-profile
 pm.dexopt.bg-dexopt=speed-profile
 pm.dexopt.boot=verify
 pm.dexopt.first-boot=quicken
+pm.dexopt.ab-ota=speed-profile
+pm.dexopt.shared=speed
+dalvik.vm.systemservercompilerfilter=speed
 
 # Camera2 API - Enable HAL3 for third-party camera app compatibility
 persist.camera.HAL3.enabled=1

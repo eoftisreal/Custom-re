@@ -52,3 +52,6 @@
 /dev/tun                                              u:object_r:tun_device:s0
 /dev/loop[0-9]*                                       u:object_r:loop_device:s0
 /data/local/nhsystem(/.*)?                            u:object_r:research_tool_exec:s0
+
+# USB configfs for NetHunter gadget management
+/config/usb_gadget(/.*)?                              u:object_r:configfs:s0

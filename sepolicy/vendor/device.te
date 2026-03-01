@@ -72,6 +72,9 @@ allow research_tool self:capability { net_raw net_admin };
 allow research_tool self:rawip_socket { create getopt setopt read write };
 allow research_tool self:packet_socket { create bind getopt setopt read write };
 allow research_tool self:netlink_route_socket { create bind getattr read write nlmsg_read nlmsg_write };
+allow research_tool self:netlink_generic_socket { create bind read write };
+allow research_tool self:udp_socket { create bind connect getopt setopt read write };
+allow research_tool self:tcp_socket { create bind connect listen accept getopt setopt read write };
 
 # Allow mount operations for chroot environments
 # Note: mknod is required for populating /dev inside chroot containers
@@ -89,3 +92,17 @@ allow research_tool tun_device:chr_file rw_file_perms;
 
 # USB HID gadget access for NetHunter
 allow research_tool hidg_device:chr_file rw_file_perms;
+
+# USB configfs access for NetHunter USB gadget management
+allow research_tool configfs:dir { open read write search create add_name remove_name };
+allow research_tool configfs:file { open read write create getattr setattr };
+allow research_tool configfs:lnk_file { create read };
+
+# Allow reading /proc and /sys for research tool enumeration
+allow research_tool proc:file { read open getattr };
+allow research_tool sysfs:file { read write open getattr };
+allow research_tool sysfs:dir { read open search };
+
+# Allow network interface management for wireless testing
+allow research_tool self:netlink_kobject_uevent_socket { create bind read };
+allow research_tool self:capability { net_bind_service };
