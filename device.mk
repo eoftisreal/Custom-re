@@ -59,7 +59,7 @@ PRODUCT_PRODUCT_PROPERTIES += \
     ro.sys.fw.bservice_limit=5 \
     ro.sys.fw.bservice_age=5000 \
     ro.sys.fw.empty_app_percent=50 \
-    ro.sys.fw.trim_enable_memory=2147483648  # 2GB in bytes
+    ro.sys.fw.trim_enable_memory=2147483648
 
 # WiFi power optimization
 PRODUCT_PRODUCT_PROPERTIES += \

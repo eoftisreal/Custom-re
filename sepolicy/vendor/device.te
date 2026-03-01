@@ -37,11 +37,14 @@ type sensors_vendor_exec, exec_type, vendor_file_type, file_type;
 init_daemon_domain(sensors_vendor)
 allow sensors_vendor hwbinder_device:chr_file rw_file_perms;
 allow sensors_vendor hwservicemanager:binder { call transfer };
+allow sensors_vendor sysfs:dir { open read search };
+allow sensors_vendor sysfs:file { open read getattr };
 
 # RIL daemon
 allow rild hwbinder_device:chr_file rw_file_perms;
 allow rild hwservicemanager:binder { call transfer };
 allow rild vndbinder_device:chr_file rw_file_perms;
+allow rild servicemanager:binder { call transfer };
 
 # Audio HAL
 type audio_vendor, domain;
