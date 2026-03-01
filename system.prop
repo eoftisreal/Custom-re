@@ -136,6 +136,15 @@ persist.camera.HAL3.enabled=1
 bluetooth.device.default_name=Galaxy J7 2016
 bluetooth.le.disable_apcf_extended_features=1
 
+# Animation scales — reduced for snappier UI on low-end hardware
+persist.sys.animator_duration_scale=0.5
+persist.sys.transition_animation_scale=0.5
+persist.sys.window_animation_scale=0.5
+
+# Thermal management — reduce excessive logging for sustained workloads
+persist.sys.thermalmonitor=1
+persist.sys.thermal.log=0
+
 # USB gadget configuration for NetHunter
 sys.usb.configfs=1
 sys.usb.ffs.ready=0

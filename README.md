@@ -190,3 +190,35 @@ mka bacon
 
 ## Disclaimer
 **Flash at your own risk.** This is custom firmware development. Incorrect configurations or flashing procedures can brick your device. Always backup your EFS/Modem partitions before flashing any custom ROM.
+
+## Changelog
+
+### 2026-03-01
+*   **system.prop:** Added animation scale properties (0.5x) for snappier UI on 2GB RAM. Added thermal management logging properties to reduce overhead during sustained workloads.
+*   **init.j7xelte.rc:** Added vendor module directory creation at `post-fs-data` to ensure out-of-tree drivers (e.g., RTL8192EU) load reliably. Added thermal governor enable and scheduler boost reset at boot for balanced thermal behavior.
+*   **SELinux:** Added `thermal_hal` domain for SoC thermal monitoring and `health_hal` domain for battery/charger reporting. Refined `file_contexts` with thermal zone sysfs labels and HAL executable labels for Thermal 2.0 and Health 2.1 services.
+*   **BoardConfig.mk:** Added `androidboot.selinux=enforcing` to kernel cmdline to enforce SELinux from first-stage init. Enabled `MALLOC_SVELTE` for reduced memory allocator overhead on 2GB RAM devices.
+*   **fstab.exynos7870:** Changed `barrier=0` on cache and userdata partitions where `journal_async_commit` is used, since the async journal commit already provides ordering guarantees and the explicit barrier adds unnecessary write overhead on eMMC.
+
+## Rationale for Kernel and SELinux Changes
+
+### Kernel Configuration Rationale
+The kernel 3.18 configuration is driven by three constraints: Android 12 compatibility, 2GB RAM optimization, and NetHunter security research support.
+
+*   **`CONFIG_PREEMPT=y`** and **`CONFIG_HIGH_RES_TIMERS=y`**: Required for responsive UI on a single-cluster Cortex-A53 SoC. Without preemption, long-running kernel paths (e.g., filesystem commits) cause visible UI jank.
+*   **`CONFIG_DEBUG_KERNEL=n`** and **`CONFIG_DEBUG_INFO=n`**: Debug infrastructure adds measurable overhead (lock debugging, assertion checks) and inflates the kernel image. Disabled for production builds to reclaim both CPU cycles and flash space.
+*   **`CONFIG_MEMCG=y`** and **`CONFIG_MEMCG_SWAP=y`**: Android 12's LMKD relies on cgroup memory accounting for per-process memory tracking. Without these, the vmpressure-based LMKD cannot accurately identify memory hogs.
+*   **`CONFIG_ZRAM=y`** and **`CONFIG_CRYPTO_LZ4=y`**: ZRAM provides 1.5GB of compressed swap using LZ4 (chosen over LZO for its lower CPU cost on Cortex-A53), effectively extending usable memory to ~3GB for research workloads.
+*   **`CONFIG_KSM=y`**: Kernel Same-page Merging deduplicates identical memory pages across processes. On a 2GB device running multiple research containers, KSM can reclaim 50-100MB.
+*   **`CONFIG_NAMESPACES`** (PID, NET, UTS, IPC, USER, MNT): Full namespace support is required for chroot/proot containers used by NetHunter. Without mount namespaces, container isolation is incomplete and processes can escape.
+*   **`CONFIG_SECCOMP_FILTER=y`**: Android 12 requires seccomp for Zygote process sandboxing. Apps that fail the seccomp check are killed at launch.
+*   **`androidboot.selinux=enforcing`** in kernel cmdline: Ensures SELinux is enforcing from the earliest init stage, before any vendor processes start. This prevents a window where processes could run unconfined.
+
+### SELinux Policy Rationale
+The SELinux policy follows Android 12's principle of least privilege while accommodating vendor HAL requirements and research tool access.
+
+*   **`thermal_hal` domain**: Isolated domain for the Thermal HAL 2.0 service. Grants read-only access to thermal zone sysfs nodes (`/sys/class/thermal/`) for temperature monitoring. Write access is deliberately excluded — the HAL reports temperatures but does not directly control cooling.
+*   **`health_hal` domain**: Isolated domain for the Health HAL 2.1 service. Grants read-only sysfs access for battery voltage, current, and charger status reporting. Separated from other HAL domains to limit blast radius if the health service is compromised.
+*   **`research_tool` domain**: Confined domain for NetHunter and security research tools. Grants `net_raw`, `net_admin`, `sys_chroot`, and USB configfs access without requiring global permissive mode. This is a deliberate trade-off: research tools need elevated capabilities, but confining them to a labeled domain ensures that only binaries in `/data/local/nhsystem/` receive these privileges.
+*   **`imsd` domain**: The IMS daemon requires binder access to both `hwservicemanager` and `servicemanager`, plus Unix socket connectivity to `rild` for VoLTE registration. Each permission was added in response to specific `avc: denied` audit logs during IMS bring-up.
+*   **File context refinements**: Thermal zone sysfs (`/sys/class/thermal/`, `/sys/devices/virtual/thermal/`) and HAL executable paths are explicitly labeled to prevent `unlabeled` type denials that would block HAL startup in enforcing mode.

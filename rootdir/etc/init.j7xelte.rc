@@ -42,6 +42,9 @@ on post-fs-data
     # Create directory for EFS
     mkdir /efs 0771 radio system
 
+    # Ensure vendor module directory exists for out-of-tree drivers
+    mkdir /vendor/lib/modules 0755 root root
+
     # NetHunter chroot directories
     mkdir /data/local/nhsystem 0755 root root
     mkdir /data/local/nhsystem/kali-armhf 0755 root root
@@ -137,6 +140,10 @@ on boot
     # NetHunter: Ensure /dev/hidg0 HID gadget is accessible to research tools
     chown system system /dev/hidg0
     chmod 0660 /dev/hidg0
+
+    # Thermal governor — reduce logging and tune for sustained workloads
+    write /sys/class/thermal/thermal_zone0/mode enabled
+    write /proc/sys/kernel/sched_boost 0
 
 # Post-boot optimization — runs after boot animation completes
 on property:sys.boot_completed=1
