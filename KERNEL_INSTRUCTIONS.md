@@ -5,10 +5,10 @@ This device tree relies on an external kernel source repository.
 ## 1. Kernel Source
 The kernel source should be placed in `kernel/samsung/exynos7870`.
 
-You can use the `lineage.dependencies` file to automatically fetch it, or add it to your local manifest (`.repo/local_manifests/j7xelte.xml`):
+You can use the `coin.dependencies` file to automatically fetch it, or add it to your local manifest (`.repo/local_manifests/j7xelte.xml`):
 
 ```xml
-<project path="kernel/samsung/exynos7870" name="android_kernel_samsung_exynos7870" remote="github" revision="lineage-19.1" />
+<project path="kernel/samsung/exynos7870" name="android_kernel_samsung_exynos7870" remote="github" revision="coin-1.0" />
 ```
 
 *Note: Ensure you replace `android_kernel_samsung_exynos7870` with the actual repository name you are using.*
