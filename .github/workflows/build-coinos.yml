@@ -1,0 +1,119 @@
+name: Build CoinOS for Samsung Galaxy J7 (j7xelte)
+
+on:
+  workflow_dispatch:
+    inputs:
+      clean_build:
+        description: 'Perform a clean build (make clean)'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    name: Build CoinOS ROM
+    runs-on: ubuntu-22.04
+    env:
+      CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
+      CCACHE_NOHASHDIR: "true"
+      CCACHE_HARDLINK: "true"
+      USE_CCACHE: "1"
+
+    steps:
+    - name: Maximize build space
+      uses: easimon/maximize-build-space@master
+      with:
+        root-reserve-mb: 8192
+        swap-size-mb: 16384
+        remove-dotnet: 'true'
+        remove-android: 'true'
+        remove-haskell: 'true'
+        remove-codeql: 'true'
+        remove-docker-images: 'true'
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+          bc bison build-essential ccache curl flex g++-multilib gcc-multilib git \
+          gnupg gperf imagemagick lib32ncurses5-dev lib32readline-dev lib32z1-dev \
+          liblz4-tool libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libwxgtk3.0-gtk3-dev \
+          libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev \
+          python3 python-is-python3 openjdk-11-jdk
+        mkdir -p ~/bin
+        curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+        chmod a+x ~/bin/repo
+        echo "$HOME/bin" >> $GITHUB_PATH
+
+    - name: Configure Git
+      run: |
+        git config --global user.name "GitHub Action Build"
+        git config --global user.email "action@github.com"
+        git config --global color.ui false
+
+    - name: Initialize repo and sync source
+      run: |
+        mkdir -p ~/workspace/coinos
+        cd ~/workspace/coinos
+        repo init -u https://github.com/eoftisreal/android.git -b coin-1.0 --depth=1
+
+        # Create local manifests directory
+        mkdir -p .repo/local_manifests
+
+        # Add the device tree (this repository) to local manifests
+        cat << 'EOF' > .repo/local_manifests/j7xelte.xml
+        <?xml version="1.0" encoding="UTF-8"?>
+        <manifest>
+          <project path="device/samsung/j7xelte" name="${{ github.repository }}" remote="github" revision="${{ github.ref_name }}" />
+          <project path="kernel/samsung/exynos7870" name="android_kernel_samsung_exynos7870" remote="github" revision="coin-1.0" />
+          <project path="vendor/samsung/j7xelte" name="android_vendor_samsung_j7xelte" remote="github" revision="coin-1.0" />
+        </manifest>
+        EOF
+
+        # Sync the source code
+        repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
+
+    - name: Setup ccache
+      uses: actions/cache@v4
+      with:
+        path: ~/.ccache
+        key: ${{ runner.os }}-coinos-ccache-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-coinos-ccache-
+
+    - name: Build ROM
+      run: |
+        cd ~/workspace/coinos
+
+        if [ "${{ github.event.inputs.clean_build }}" = "true" ]; then
+          make clean
+        fi
+
+        source build/envsetup.sh
+        lunch coin_j7xelte-userdebug
+
+        # Set ccache directory explicitly
+        export CCACHE_DIR=~/.ccache
+        ccache -M 50G
+
+        # Start the build
+        mka bacon -j$(nproc --all)
+
+    - name: Upload Artifacts
+      if: success()
+      uses: actions/upload-artifact@v4
+      with:
+        name: CoinOS-j7xelte-ROM
+        path: ~/workspace/coinos/out/target/product/j7xelte/CoinOS*.zip
+        retention-days: 7
+
+    - name: Upload Build Logs on Failure
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-logs
+        path: ~/workspace/coinos/out/build_*.log
+        retention-days: 7
