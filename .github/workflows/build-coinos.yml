@@ -26,6 +26,7 @@ jobs:
       with:
         root-reserve-mb: 12288
         swap-size-mb: 16384
+        build-mount-path: /home/runner/workspace
         remove-dotnet: 'true'
         remove-android: 'true'
         remove-haskell: 'true'
@@ -41,8 +42,11 @@ jobs:
         df -h /
         sudo apt-get clean
         sudo rm -rf /var/lib/apt/lists/*
+        sudo rm -rf /opt/hostedtoolcache
         echo "=== Root partition after cleanup ==="
         df -h /
+        echo "=== Build volume ==="
+        df -h /home/runner/workspace
 
     - name: Install build dependencies
       run: |
