@@ -24,7 +24,7 @@ jobs:
     - name: Maximize build space
       uses: easimon/maximize-build-space@v10
       with:
-        root-reserve-mb: 8192
+        root-reserve-mb: 12288
         swap-size-mb: 16384
         remove-dotnet: 'true'
         remove-android: 'true'
@@ -35,15 +35,37 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Free root partition space
+      run: |
+        echo "=== Root partition before cleanup ==="
+        df -h /
+        sudo apt-get clean
+        sudo rm -rf /var/lib/apt/lists/*
+        echo "=== Root partition after cleanup ==="
+        df -h /
+
     - name: Install build dependencies
       run: |
-        sudo apt-get update
+        for attempt in 1 2 3; do
+          echo "apt-get update attempt ${attempt}..."
+          if sudo apt-get update; then
+            break
+          fi
+          if [ "${attempt}" -eq 3 ]; then
+            echo "ERROR: apt-get update failed after 3 attempts"
+            exit 1
+          fi
+          echo "Retrying in 10 seconds..."
+          sleep 10
+        done
         sudo apt-get install -y --no-install-recommends \
           bc bison build-essential ccache curl flex g++-multilib gcc-multilib git \
           gnupg gperf imagemagick lib32ncurses5-dev lib32readline-dev lib32z1-dev \
           liblz4-tool libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libwxgtk3.0-gtk3-dev \
           libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev \
           python3 python-is-python3 openjdk-11-jdk
+        sudo apt-get clean
+        sudo rm -rf /var/lib/apt/lists/*
         mkdir -p ~/bin
         curl -fL --retry 3 https://storage.googleapis.com/git-repo-downloads/repo -o ~/bin/repo
         chmod a+x ~/bin/repo
