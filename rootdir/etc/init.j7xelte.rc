@@ -4,8 +4,8 @@ import /vendor/etc/init/hw/init.exynos7870.rc
 import /vendor/etc/init/hw/init.samsung.rc
 
 on early-init
-    # Debugfs: mount only if needed for boot, restrict access
-    mount debugfs debugfs /sys/kernel/debug mode=0750,uid=0,gid=0
+    # Debugfs: mount only if needed for boot, restrict to root only
+    mount debugfs debugfs /sys/kernel/debug mode=0700,uid=0,gid=0
 
 on init
     # Support legacy paths
@@ -176,5 +176,5 @@ service imsd /vendor/bin/imsd
     disabled
     oneshot
 
-on property:gsm.nitz.time=*
+on property:sys.rilconnected=1
     start imsd
