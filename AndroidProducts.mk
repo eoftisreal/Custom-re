@@ -1,7 +1,7 @@
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/coinos_j7xelte.mk
+    $(LOCAL_DIR)/coin_j7xelte.mk
 
 COMMON_LUNCH_CHOICES := \
-    coinos_j7xelte-user \
-    coinos_j7xelte-userdebug \
-    coinos_j7xelte-eng
+    coin_j7xelte-user \
+    coin_j7xelte-userdebug \
+    coin_j7xelte-eng

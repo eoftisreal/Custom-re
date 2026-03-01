@@ -6,9 +6,9 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 $(call inherit-product, device/samsung/j7xelte/device.mk)
 
 # Inherit some common CoinOS stuff.
-$(call inherit-product, vendor/coinos/config/common_full_phone.mk)
+$(call inherit-product, vendor/coin/config/common_full_phone.mk)
 
-PRODUCT_NAME := coinos_j7xelte
+PRODUCT_NAME := coin_j7xelte
 PRODUCT_DEVICE := j7xelte
 PRODUCT_MANUFACTURER := Samsung
 PRODUCT_BRAND := samsung
