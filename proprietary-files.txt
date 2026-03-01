@@ -1,5 +1,5 @@
 # Proprietary files for Samsung Galaxy J7 (2016)
-# Based on LineageOS 19.1 for Exynos 7870 devices
+# Based on CoinOS 1.0 for Exynos 7870 devices
 
 # Audio
 lib/libaudioroute.so
