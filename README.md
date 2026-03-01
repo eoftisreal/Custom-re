@@ -75,7 +75,7 @@ Set up your local build environment with the necessary dependencies (repo, git, 
 
 ### 2. Sync Source
 ```bash
-repo init -u https://github.com/LineageOS/android.git -b lineage-19.1
+repo init -u https://github.com/eoftisreal/android.git -b lineage-19.1
 # Add local manifests if necessary
 repo sync
 ```
