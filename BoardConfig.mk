@@ -65,6 +65,16 @@ TARGET_KERNEL_CONFIG := exynos7870_j7xelte_defconfig
 #   CONFIG_MODULE_UNLOAD=y
 #   CONFIG_MODVERSIONS=y
 
+# Security hardening - Kernel config requirements:
+#   CONFIG_CC_STACKPROTECTOR_STRONG=y  (stack canaries)
+#   CONFIG_HARDENED_USERCOPY=y         (hardened usercopy)
+#   CONFIG_FORTIFY_SOURCE=y            (buffer overflow detection)
+#   CONFIG_STRICT_KERNEL_RWX=y         (read-only kernel text/rodata)
+#   CONFIG_SECURITY_PERF_EVENTS_RESTRICT=y
+#   CONFIG_PAGE_TABLE_ISOLATION=y      (Spectre v2 mitigation, if available)
+#   CONFIG_SECCOMP=y                   (syscall filtering)
+#   CONFIG_SECCOMP_FILTER=y
+
 # Partitions
 BOARD_FLASH_BLOCK_SIZE := 131072 # (BOARD_KERNEL_PAGESIZE * 64)
 BOARD_BOOTIMAGE_PARTITION_SIZE := 33554432

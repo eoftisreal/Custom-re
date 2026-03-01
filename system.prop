@@ -49,15 +49,16 @@ dalvik.vm.dex2oat-threads=4
 dalvik.vm.image-dex2oat-threads=4
 
 # Background Process Management
-ro.sys.fw.bg_apps_limit=20
 persist.device_config.runtime_native.usap_pool_enabled=true
 
 # LMKD tuning for Android 12 on 2GB RAM
+# Note: PSI (Pressure Stall Information) requires kernel 4.20+.
+# Kernel 3.18 does not support PSI, so we use vmpressure-based LMKD.
+ro.lmk.use_psi=false
 ro.lmk.low=1001
 ro.lmk.medium=800
 ro.lmk.swap_free_low_percentage=10
 ro.lmk.swap_util_max=90
-ro.lmk.psi_partial_stall_ms=70
 ro.lmk.thrashing_limit=30
 ro.lmk.thrashing_limit_decay=50
 
@@ -75,3 +76,17 @@ ro.sys.fw.use_trim=true
 # Android 12 specific
 persist.sys.usb.config=mtp,adb
 ro.surface_flinger.use_color_management=true
+
+# ART - Profile-guided compilation for faster app launch (Android 12)
+dalvik.vm.usejit=true
+pm.dexopt.install=speed-profile
+pm.dexopt.bg-dexopt=speed-profile
+pm.dexopt.boot=verify
+pm.dexopt.first-boot=quicken
+
+# Camera2 API - Enable HAL3 for third-party camera app compatibility
+persist.camera.HAL3.enabled=1
+
+# Bluetooth - Device name and LE compatibility
+bluetooth.device.default_name=Galaxy J7 2016
+bluetooth.le.disable_apcf_extended_features=1

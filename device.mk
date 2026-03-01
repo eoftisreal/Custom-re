@@ -49,6 +49,13 @@ PRODUCT_PRODUCT_PROPERTIES += \
     ro.lmk.kill_timeout_ms=100 \
     ro.lmk.use_minfree_levels=true
 
+# Adaptive Battery & App Standby Buckets (Android 12)
+PRODUCT_PRODUCT_PROPERTIES += \
+    persist.sys.fw.bg_apps_limit=24 \
+    ro.sys.fw.bservice_enable=true \
+    ro.sys.fw.bservice_limit=5 \
+    ro.sys.fw.bservice_age=5000
+
 # System Properties
 TARGET_SYSTEM_PROP += $(LOCAL_PATH)/system.prop
 

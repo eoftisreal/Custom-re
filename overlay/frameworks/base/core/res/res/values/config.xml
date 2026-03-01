@@ -87,4 +87,10 @@
     <!-- Front flash LED: Proximity sensor timeout (ms) to disable flash -->
     <integer name="config_flashlightProximityTimeout">300</integer>
 
+    <!-- WiFi: Enable connected MAC address randomization for privacy (Android 12) -->
+    <bool name="config_wifi_connected_mac_randomization_supported">true</bool>
+
+    <!-- WiFi: Enable AP MAC randomization for tethering -->
+    <bool name="config_wifi_ap_mac_randomization_supported">true</bool>
+
 </resources>

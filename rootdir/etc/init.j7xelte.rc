@@ -11,15 +11,17 @@ on init
     # Support legacy paths
     symlink /sdcard /storage/sdcard0
 
+on fs
+    mount_all /vendor/etc/fstab.exynos7870
+
+on post-fs
     # ZRAM setup for 2GB RAM device
+    # Note: Must run after mount_all so /system/bin/mkswap is available
     write /sys/block/zram0/comp_algorithm lz4
     write /sys/block/zram0/max_comp_streams 4
     write /sys/block/zram0/disksize 1073741824
     exec u:r:init:s0 -- /system/bin/mkswap /dev/block/zram0
     exec u:r:init:s0 -- /system/bin/swapon /dev/block/zram0
-
-on fs
-    mount_all /vendor/etc/fstab.exynos7870
 
 on post-fs-data
     # Create directory for EFS
