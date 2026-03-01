@@ -8,6 +8,22 @@ init_daemon_domain(gpsd)
 # Note: Monitor 'avc: denied' logs for these domains if IMS fails to register.
 # Common denials often involve 'connectto' permissions for ims service.
 
+# IMS daemon domain for VoLTE/VT service registration
+type imsd, domain;
+type imsd_exec, exec_type, vendor_file_type, file_type;
+
+init_daemon_domain(imsd)
+allow imsd hwbinder_device:chr_file rw_file_perms;
+allow imsd hwservicemanager:binder { call transfer };
+allow imsd vndbinder_device:chr_file rw_file_perms;
+allow imsd servicemanager:binder { call transfer };
+allow imsd rild:unix_stream_socket connectto;
+allow imsd radio_data_file:dir { search read open };
+allow imsd radio_data_file:file { read open getattr };
+allow imsd efs_file:dir { search read };
+allow imsd efs_file:file { read open getattr };
+allow imsd self:capability { net_admin net_raw };
+
 # Binder access for Android 12 HALs
 allow gpsd hwbinder_device:chr_file rw_file_perms;
 allow gpsd hwservicemanager:binder { call transfer };
@@ -45,6 +61,12 @@ allow rild hwbinder_device:chr_file rw_file_perms;
 allow rild hwservicemanager:binder { call transfer };
 allow rild vndbinder_device:chr_file rw_file_perms;
 allow rild servicemanager:binder { call transfer };
+allow rild efs_file:dir { search read open };
+allow rild efs_file:file { read write open getattr };
+allow rild radio_data_file:dir { create search read write open add_name remove_name };
+allow rild radio_data_file:file { create read write open getattr setattr };
+allow rild self:netlink_route_socket { create bind read write nlmsg_read };
+allow rild self:udp_socket { create bind connect read write getopt setopt };
 
 # Audio HAL
 type audio_vendor, domain;

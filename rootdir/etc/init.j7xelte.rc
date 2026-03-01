@@ -4,8 +4,8 @@ import /vendor/etc/init/hw/init.exynos7870.rc
 import /vendor/etc/init/hw/init.samsung.rc
 
 on early-init
-    mount debugfs debugfs /sys/kernel/debug
-    chmod 0755 /sys/kernel/debug
+    # Debugfs: mount only if needed for boot, restrict access
+    mount debugfs debugfs /sys/kernel/debug mode=0750,uid=0,gid=0
 
 on init
     # Support legacy paths
@@ -23,15 +23,15 @@ on post-fs
     exec u:r:init:s0 -- /system/bin/mkswap /dev/block/zram0
     exec u:r:init:s0 -- /system/bin/swapon /dev/block/zram0
 
-    # Virtual memory tuning for I/O-heavy research workloads
-    write /proc/sys/vm/dirty_ratio 20
+    # Virtual memory tuning — balanced for stability and responsiveness
+    write /proc/sys/vm/dirty_ratio 15
     write /proc/sys/vm/dirty_background_ratio 5
-    write /proc/sys/vm/dirty_expire_centisecs 200
+    write /proc/sys/vm/dirty_expire_centisecs 300
     write /proc/sys/vm/dirty_writeback_centisecs 500
     write /proc/sys/vm/vfs_cache_pressure 100
-    write /proc/sys/vm/swappiness 80
+    write /proc/sys/vm/swappiness 60
     write /proc/sys/vm/overcommit_memory 1
-    write /proc/sys/vm/min_free_kbytes 8192
+    write /proc/sys/vm/min_free_kbytes 11520
     write /proc/sys/vm/extra_free_kbytes 24300
     write /proc/sys/vm/page-cluster 0
 
@@ -59,24 +59,24 @@ on boot
 
     # CPU governor tuning (schedutil for Exynos 7870)
     write /sys/devices/system/cpu/cpufreq/policy0/scaling_governor schedutil
-    write /sys/devices/system/cpu/cpufreq/policy0/schedutil/up_rate_limit_us 500
+    write /sys/devices/system/cpu/cpufreq/policy0/schedutil/up_rate_limit_us 1000
     write /sys/devices/system/cpu/cpufreq/policy0/schedutil/down_rate_limit_us 20000
 
-    # Kernel scheduler tuning for maximum throughput
-    write /proc/sys/kernel/sched_latency_ns 10000000
-    write /proc/sys/kernel/sched_min_granularity_ns 1500000
+    # Kernel scheduler tuning — balanced latency and thermal stability
+    write /proc/sys/kernel/sched_latency_ns 15000000
+    write /proc/sys/kernel/sched_min_granularity_ns 2000000
     write /proc/sys/kernel/sched_wakeup_granularity_ns 3000000
     write /proc/sys/kernel/sched_migration_cost_ns 500000
     write /proc/sys/kernel/sched_child_runs_first 0
     write /proc/sys/kernel/sched_tunable_scaling 0
 
-    # I/O scheduler optimization — maximum throughput for eMMC
+    # I/O scheduler optimization — balanced throughput for eMMC
     write /sys/block/mmcblk0/queue/scheduler cfq
     write /sys/block/mmcblk0/queue/read_ahead_kb 2048
     write /sys/block/mmcblk0/queue/nr_requests 128
     write /sys/block/mmcblk0/queue/iostats 0
     write /sys/block/mmcblk0/queue/add_random 0
-    write /sys/block/mmcblk0/queue/rq_affinity 1
+    write /sys/block/mmcblk0/queue/rq_affinity 2
     write /sys/block/mmcblk0/queue/nomerges 0
     # Boot partition readahead
     write /sys/block/mmcblk0boot0/queue/read_ahead_kb 2048
@@ -88,20 +88,24 @@ on boot
 
     # KSM (Kernel Same-page Merging) — deduplicate memory pages
     write /sys/kernel/mm/ksm/run 1
-    write /sys/kernel/mm/ksm/sleep_millisecs 500
-    write /sys/kernel/mm/ksm/pages_to_scan 100
+    write /sys/kernel/mm/ksm/sleep_millisecs 1000
+    write /sys/kernel/mm/ksm/pages_to_scan 64
 
     # USB OTG stability — disable aggressive autosuspend
     write /sys/module/usbcore/parameters/autosuspend -1
     write /sys/bus/usb/devices/usb1/power/control on
     write /sys/bus/usb/devices/usb2/power/control on
+    # Reduce USB kernel log spam to prevent resets from log congestion
+    write /proc/sys/kernel/printk_ratelimit 5
+    write /proc/sys/kernel/printk_ratelimit_burst 10
 
-    # Network stack tuning for security research workloads
+    # Network stack tuning for stability and research workloads
     write /proc/sys/net/core/rmem_max 8388608
     write /proc/sys/net/core/wmem_max 8388608
     write /proc/sys/net/core/rmem_default 1048576
     write /proc/sys/net/core/wmem_default 1048576
     write /proc/sys/net/core/netdev_max_backlog 5000
+    write /proc/sys/net/core/netdev_budget 600
     write /proc/sys/net/core/somaxconn 1024
     write /proc/sys/net/ipv4/tcp_rmem "4096 1048576 8388608"
     write /proc/sys/net/ipv4/tcp_wmem "4096 1048576 8388608"
@@ -110,7 +114,10 @@ on boot
     write /proc/sys/net/ipv4/tcp_keepalive_time 300
     write /proc/sys/net/ipv4/tcp_keepalive_probes 5
     write /proc/sys/net/ipv4/tcp_keepalive_intvl 15
+    write /proc/sys/net/ipv4/tcp_max_orphans 16384
+    write /proc/sys/net/ipv4/tcp_tw_reuse 1
     write /proc/sys/net/netfilter/nf_conntrack_max 65536
+    write /proc/sys/net/netfilter/nf_conntrack_tcp_timeout_established 600
     write /proc/sys/net/ipv4/ip_local_port_range "1024 65535"
 
     # TCP optimization — kernel sysctl
@@ -137,7 +144,9 @@ on property:sys.boot_completed=1
     write /proc/sys/vm/drop_caches 1
 
     # Reduce readahead after boot for steady-state efficiency
-    write /sys/block/mmcblk0/queue/read_ahead_kb 1024
+    write /sys/block/mmcblk0/queue/read_ahead_kb 512
+    write /sys/block/mmcblk0boot0/queue/read_ahead_kb 512
+    write /sys/block/mmcblk0boot1/queue/read_ahead_kb 512
 
     # Set I/O scheduler to deadline for steady-state
     # CFQ provides fairness during boot (many concurrent processes); deadline provides
@@ -147,10 +156,25 @@ on property:sys.boot_completed=1
     # Final thermal — slightly relax governor for sustained performance
     write /sys/devices/system/cpu/cpufreq/policy0/schedutil/down_rate_limit_us 10000
 
+    # Unmount debugfs post-boot — not needed in production steady-state
+    umount /sys/kernel/debug
+
 service ril-daemon /vendor/bin/hw/rild
     class main
     user radio
-    group radio cache inet misc audio log readproc wakelock
+    group radio cache inet misc audio log readproc wakelock net_admin net_raw
     capabilities BLOCK_SUSPEND NET_ADMIN NET_RAW
     socket rild stream 660 root radio
     socket rild-debug stream 660 radio system
+    onrestart restart cpboot-daemon
+
+# IMS daemon — starts after RIL for VoLTE/VT registration
+service imsd /vendor/bin/imsd
+    class main
+    user radio
+    group radio inet log
+    disabled
+    oneshot
+
+on property:gsm.nitz.time=*
+    start imsd

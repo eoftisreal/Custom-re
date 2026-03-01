@@ -48,14 +48,18 @@ PRODUCT_PRODUCT_PROPERTIES += \
     ro.lmk.upgrade_pressure=100 \
     ro.lmk.downgrade_pressure=100 \
     ro.lmk.kill_heaviest_task=true \
-    ro.lmk.kill_timeout_ms=100 \
+    ro.lmk.kill_timeout_ms=150 \
     ro.lmk.use_minfree_levels=true \
     ro.lmk.log_stats=false
+
+# Cgroup memory tuning for 2GB RAM
+PRODUCT_PRODUCT_PROPERTIES += \
+    persist.sys.use_boot_compact=true \
+    ro.sys.fw.bservice_enable=true
 
 # Adaptive Battery & App Standby Buckets (Android 12)
 PRODUCT_PRODUCT_PROPERTIES += \
     persist.sys.fw.bg_apps_limit=24 \
-    ro.sys.fw.bservice_enable=true \
     ro.sys.fw.bservice_limit=5 \
     ro.sys.fw.bservice_age=5000 \
     ro.sys.fw.empty_app_percent=50 \

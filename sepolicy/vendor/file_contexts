@@ -1,6 +1,12 @@
 # RIL
 /vendor/bin/hw/rild         u:object_r:rild_exec:s0
 
+# IMS daemon
+/vendor/bin/imsd            u:object_r:imsd_exec:s0
+
+# EFS partition (modem/RIL calibration data)
+/efs(/.*)?                  u:object_r:efs_file:s0
+
 # WiFi
 /vendor/bin/hw/wpa_supplicant u:object_r:hal_wifi_supplicant_default_exec:s0
 /vendor/bin/hw/hostapd      u:object_r:hal_wifi_hostapd_default_exec:s0

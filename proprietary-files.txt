@@ -82,6 +82,7 @@ vendor/lib64/libomx_exynos_v4l2.so
 
 # RIL
 vendor/bin/hw/rild
+vendor/bin/imsd
 lib/libril.so
 vendor/lib/libsec-ril.so
 vendor/lib/libsec-ril-dsds.so
