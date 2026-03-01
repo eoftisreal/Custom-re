@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This repository contains the foundational device tree and configuration for building custom LineageOS 19.1 (Android 12) firmware for the Samsung Galaxy J7 (2016), model **SM-J710FN**, codenamed **j7xelte**.
+This repository contains the foundational device tree and configuration for building custom CoinOS 1.0 (Android 12) firmware for the Samsung Galaxy J7 (2016), model **SM-J710FN**, codenamed **j7xelte**.
 
 The project aims to provide a stable, vanilla (GApps-free) Android experience optimized for the Exynos 7870 chipset, balancing performance with security and feature completeness.
 
@@ -20,7 +20,7 @@ The project aims to provide a stable, vanilla (GApps-free) Android experience op
 ## Features & Configuration
 
 ### Base System
-*   **OS Base:** LineageOS 19.1 (Android 12)
+*   **OS Base:** CoinOS 1.0 (Android 12)
 *   **Build Variant:** `userdebug` (Root access via ADB for development)
 *   **GApps:** None (Vanilla). Users can flash NikGApps or MindTheGapps separately.
 
@@ -60,7 +60,7 @@ The project follows the standard Android build system hierarchy:
 
 *   **`device/samsung/j7xelte/`**: The core device configuration.
     *   `BoardConfig.mk`: Defines hardware architecture, partition sizes, kernel flags, and VNDK configuration.
-    *   `lineage_j7xelte.mk`: The product makefile that inherits LineageOS common configurations.
+    *   `coinos_j7xelte.mk`: The product makefile that inherits CoinOS common configurations.
     *   `rootdir/etc/`: Contains init scripts (`init.j7xelte.rc`) and partition tables (`fstab.exynos7870`).
     *   `sepolicy/`: SELinux policy rules and file contexts for Android 12 enforcing mode.
 
@@ -75,7 +75,7 @@ Set up your local build environment with the necessary dependencies (repo, git, 
 
 ### 2. Sync Source
 ```bash
-repo init -u https://github.com/LineageOS/android.git -b lineage-19.1
+repo init -u https://github.com/CoinOS/android.git -b coinos-1.0
 # Add local manifests if necessary
 repo sync
 ```
@@ -88,7 +88,7 @@ Shim libraries (`libshim_camera.so`, `libshim_ril.so`) must be built and placed 
 ### 4. Build
 ```bash
 source build/envsetup.sh
-lunch lineage_j7xelte-userdebug
+lunch coinos_j7xelte-userdebug
 mka bacon
 ```
 

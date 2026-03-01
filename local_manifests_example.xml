@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
-    <project path="kernel/samsung/exynos7870" name="android_kernel_samsung_exynos7870" remote="github" revision="lineage-19.1" />
-    <project path="vendor/samsung/j7xelte" name="android_vendor_samsung_j7xelte" remote="github" revision="lineage-19.1" />
+    <project path="kernel/samsung/exynos7870" name="android_kernel_samsung_exynos7870" remote="github" revision="coinos-1.0" />
+    <project path="vendor/samsung/j7xelte" name="android_vendor_samsung_j7xelte" remote="github" revision="coinos-1.0" />
 </manifest>

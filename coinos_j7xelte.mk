@@ -5,10 +5,10 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 # Inherit from device makefile
 $(call inherit-product, device/samsung/j7xelte/device.mk)
 
-# Inherit some common LineageOS stuff.
-$(call inherit-product, vendor/lineage/config/common_full_phone.mk)
+# Inherit some common CoinOS stuff.
+$(call inherit-product, vendor/coinos/config/common_full_phone.mk)
 
-PRODUCT_NAME := lineage_j7xelte
+PRODUCT_NAME := coinos_j7xelte
 PRODUCT_DEVICE := j7xelte
 PRODUCT_MANUFACTURER := Samsung
 PRODUCT_BRAND := samsung
