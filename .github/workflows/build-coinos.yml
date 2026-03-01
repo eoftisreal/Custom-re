@@ -13,6 +13,7 @@ jobs:
   build:
     name: Build CoinOS ROM
     runs-on: ubuntu-22.04
+    timeout-minutes: 300
     env:
       CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
       CCACHE_NOHASHDIR: "true"
@@ -21,7 +22,7 @@ jobs:
 
     steps:
     - name: Maximize build space
-      uses: easimon/maximize-build-space@master
+      uses: easimon/maximize-build-space@v10
       with:
         root-reserve-mb: 8192
         swap-size-mb: 16384
@@ -44,9 +45,9 @@ jobs:
           libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev \
           python3 python-is-python3 openjdk-11-jdk
         mkdir -p ~/bin
-        curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+        curl -fL --retry 3 https://storage.googleapis.com/git-repo-downloads/repo -o ~/bin/repo
         chmod a+x ~/bin/repo
-        echo "$HOME/bin" >> $GITHUB_PATH
+        echo "$HOME/bin" >> "$GITHUB_PATH"
 
     - name: Configure Git
       run: |
@@ -64,17 +65,41 @@ jobs:
         mkdir -p .repo/local_manifests
 
         # Add the device tree (this repository) to local manifests
-        cat << 'EOF' > .repo/local_manifests/j7xelte.xml
+        # Use a separate variable for GitHub expressions so heredoc quoting works
+        REPO_NAME="${{ github.repository }}"
+        REF_NAME="${{ github.ref_name }}"
+        cat > .repo/local_manifests/j7xelte.xml << EOF
         <?xml version="1.0" encoding="UTF-8"?>
         <manifest>
-          <project path="device/samsung/j7xelte" name="${{ github.repository }}" remote="github" revision="${{ github.ref_name }}" />
+          <project path="device/samsung/j7xelte" name="${REPO_NAME}" remote="github" revision="${REF_NAME}" />
           <project path="kernel/samsung/exynos7870" name="android_kernel_samsung_exynos7870" remote="github" revision="coin-1.0" />
           <project path="vendor/samsung/j7xelte" name="android_vendor_samsung_j7xelte" remote="github" revision="coin-1.0" />
         </manifest>
         EOF
 
-        # Sync the source code
-        repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
+        # Verify the manifest is valid XML
+        xmllint --noout .repo/local_manifests/j7xelte.xml || { echo "ERROR: Invalid local manifest XML"; cat .repo/local_manifests/j7xelte.xml; exit 1; }
+
+        # Sync the source code with retry logic
+        for attempt in 1 2 3; do
+          echo "repo sync attempt ${attempt}..."
+          if repo sync -c -j4 --force-sync --no-clone-bundle --no-tags; then
+            echo "repo sync succeeded on attempt ${attempt}"
+            break
+          fi
+          if [ "${attempt}" -eq 3 ]; then
+            echo "ERROR: repo sync failed after 3 attempts"
+            exit 1
+          fi
+          echo "repo sync failed, retrying in 15 seconds..."
+          sleep 15
+        done
+
+    - name: Check disk space
+      run: |
+        echo "=== Disk space before build ==="
+        df -h /
+        df -h ~/workspace/coinos || true
 
     - name: Setup ccache
       uses: actions/cache@v4
@@ -85,6 +110,7 @@ jobs:
           ${{ runner.os }}-coinos-ccache-
 
     - name: Build ROM
+      shell: bash
       run: |
         cd ~/workspace/coinos
 
@@ -98,9 +124,21 @@ jobs:
         # Set ccache directory explicitly
         export CCACHE_DIR=~/.ccache
         ccache -M 50G
+        ccache -z
+
+        # Limit jobs based on available RAM (approx 2GB per job)
+        MEM_GB=$(awk '/MemTotal/ {printf "%d", $2/1024/1024}' /proc/meminfo)
+        MAX_JOBS=$((MEM_GB < 1 ? 1 : MEM_GB / 2))
+        NPROC=$(nproc --all)
+        JOBS=$((MAX_JOBS < NPROC ? MAX_JOBS : NPROC))
+        echo "Building with -j${JOBS} (RAM: ${MEM_GB}GB, CPUs: ${NPROC})"
 
         # Start the build
-        mka bacon -j$(nproc --all)
+        mka bacon -j${JOBS}
+
+    - name: Print ccache stats
+      if: always()
+      run: ccache -s || true
 
     - name: Upload Artifacts
       if: success()
@@ -108,6 +146,7 @@ jobs:
       with:
         name: CoinOS-j7xelte-ROM
         path: ~/workspace/coinos/out/target/product/j7xelte/CoinOS*.zip
+        if-no-files-found: error
         retention-days: 7
 
     - name: Upload Build Logs on Failure
@@ -115,5 +154,9 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: build-logs
-        path: ~/workspace/coinos/out/build_*.log
+        path: |
+          ~/workspace/coinos/out/build_*.log
+          ~/workspace/coinos/out/verbose.log.gz
+          ~/workspace/coinos/out/error.log
+        if-no-files-found: ignore
         retention-days: 7
