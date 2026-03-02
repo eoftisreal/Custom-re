@@ -24,7 +24,7 @@ jobs:
     - name: Maximize build space
       uses: easimon/maximize-build-space@v10
       with:
-        root-reserve-mb: 12288
+        root-reserve-mb: 4096
         swap-size-mb: 16384
         build-mount-path: /home/runner/workspace
         remove-dotnet: 'true'
@@ -43,6 +43,19 @@ jobs:
         sudo apt-get clean
         sudo rm -rf /var/lib/apt/lists/*
         sudo rm -rf /opt/hostedtoolcache
+        sudo rm -rf /usr/share/swift
+        sudo rm -rf /usr/share/miniconda
+        sudo rm -rf /usr/share/az_*
+        sudo rm -rf /usr/share/kotlinc
+        sudo rm -rf /usr/share/gradle*
+        sudo rm -rf /usr/share/sbt
+        sudo rm -rf /usr/local/graalvm
+        sudo rm -rf /usr/local/share/powershell
+        sudo rm -rf /usr/local/share/chromium
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /usr/local/lib/node_modules
+        sudo rm -rf /opt/ghc
+        sudo rm -rf /opt/pipx
         echo "=== Root partition after cleanup ==="
         df -h /
         echo "=== Build volume ==="
@@ -82,50 +95,113 @@ jobs:
         git config --global color.ui false
 
     - name: Initialize repo and sync source
+      env:
+        REPO_TRACE: "0"
       run: |
-        mkdir -p ~/workspace/coinos
-        cd ~/workspace/coinos
+        WORKSPACE_DIR="/home/runner/workspace/coinos"
+        mkdir -p "${WORKSPACE_DIR}"
+        cd "${WORKSPACE_DIR}"
+
+        echo "=== Disk space before repo init ==="
+        df -h /home/runner/workspace
+
         repo init -u https://github.com/eoftisreal/android.git -b main --depth=1
 
         # Create local manifests directory
         mkdir -p .repo/local_manifests
 
         # Add the device tree (this repository) to local manifests
-        # Use a separate variable for GitHub expressions so heredoc quoting works
         REPO_NAME="${{ github.repository }}"
         REF_NAME="${{ github.ref_name }}"
-        cat > .repo/local_manifests/j7xelte.xml << EOF
+        cat > .repo/local_manifests/j7xelte.xml << 'MANIFEST_EOF'
         <?xml version="1.0" encoding="UTF-8"?>
         <manifest>
-          <project path="device/samsung/j7xelte" name="${REPO_NAME}" remote="github" revision="${REF_NAME}" />
+          <project path="device/samsung/j7xelte" name="REPO_NAME_PLACEHOLDER" remote="github" revision="REF_NAME_PLACEHOLDER" />
           <project path="kernel/samsung/exynos7870" name="android_kernel_samsung_exynos7870" remote="github" revision="main" />
           <project path="vendor/samsung/j7xelte" name="android_vendor_samsung_j7xelte" remote="github" revision="main" />
         </manifest>
-        EOF
+        MANIFEST_EOF
+
+        # Substitute placeholders with actual values
+        sed -i "s|REPO_NAME_PLACEHOLDER|${REPO_NAME}|g" .repo/local_manifests/j7xelte.xml
+        sed -i "s|REF_NAME_PLACEHOLDER|${REF_NAME}|g" .repo/local_manifests/j7xelte.xml
 
         # Verify the manifest is valid XML
-        xmllint --noout .repo/local_manifests/j7xelte.xml || { echo "ERROR: Invalid local manifest XML"; cat .repo/local_manifests/j7xelte.xml; exit 1; }
+        echo "=== Validating local manifest XML ==="
+        cat .repo/local_manifests/j7xelte.xml
+        xmllint --noout .repo/local_manifests/j7xelte.xml || {
+          echo "ERROR: Invalid local manifest XML"
+          exit 1
+        }
+        echo "Local manifest XML is valid."
 
-        # Sync the source code with retry logic
+        # Verify that linked repositories are accessible
+        echo "=== Checking repository accessibility ==="
+        for repo_url in \
+          "https://github.com/${REPO_NAME}" \
+          "https://github.com/eoftisreal/android_kernel_samsung_exynos7870" \
+          "https://github.com/eoftisreal/android_vendor_samsung_j7xelte"; do
+          if curl -fsSL --retry 2 -o /dev/null -w "%{http_code}" "${repo_url}" | grep -q "200"; then
+            echo "  OK: ${repo_url}"
+          else
+            echo "  WARNING: ${repo_url} may not be accessible (non-200 status)"
+          fi
+        done
+
+        # Sync the source code with retry logic and cleanup between attempts
         for attempt in 1 2 3; do
-          echo "repo sync attempt ${attempt}..."
-          if repo sync -c -j4 --force-sync --no-clone-bundle --no-tags; then
+          echo "=== repo sync attempt ${attempt} of 3 ==="
+          echo "Disk space before sync attempt:"
+          df -h /home/runner/workspace
+
+          # Check minimum disk space (need at least 10GB free)
+          AVAIL_KB=$(df --output=avail /home/runner/workspace | tail -1)
+          AVAIL_GB=$((AVAIL_KB / 1024 / 1024))
+          echo "Available space: ${AVAIL_GB}GB"
+          if [ "${AVAIL_GB}" -lt 10 ]; then
+            echo "WARNING: Low disk space (${AVAIL_GB}GB available). Cleaning up..."
+            # Remove repo trace and garbage files to reclaim space
+            rm -f .repo/.repo_trace 2>/dev/null || true
+            find .repo -name "*.lock" -delete 2>/dev/null || true
+            repo forall -c 'git gc --prune=now' 2>/dev/null || true
+            echo "Disk space after cleanup:"
+            df -h /home/runner/workspace
+          fi
+
+          if repo sync -c -j2 --force-sync --no-clone-bundle --no-tags --optimized-fetch 2>&1 | tee /tmp/repo_sync.log; then
             echo "repo sync succeeded on attempt ${attempt}"
             break
           fi
+
           if [ "${attempt}" -eq 3 ]; then
             echo "ERROR: repo sync failed after 3 attempts"
+            echo "=== Last sync log (tail) ==="
+            tail -100 /tmp/repo_sync.log || true
+            echo "=== Disk space at failure ==="
+            df -h
             exit 1
           fi
-          echo "repo sync failed, retrying in 15 seconds..."
-          sleep 15
+
+          echo "repo sync failed on attempt ${attempt}, cleaning up before retry..."
+          # Clean partial objects and garbage to free space before retry
+          rm -f .repo/.repo_trace 2>/dev/null || true
+          find .repo -name "*.lock" -delete 2>/dev/null || true
+          repo forall -c 'git clean -fdx' 2>/dev/null || true
+          repo forall -c 'git gc --aggressive --prune=now' 2>/dev/null || true
+          echo "Disk space after cleanup:"
+          df -h /home/runner/workspace
+          echo "Retrying in 30 seconds..."
+          sleep 30
         done
 
     - name: Check disk space
       run: |
         echo "=== Disk space before build ==="
         df -h /
-        df -h ~/workspace/coinos || true
+        df -h /home/runner/workspace || true
+        echo "=== Workspace directory size ==="
+        du -sh /home/runner/workspace/coinos/.repo || true
+        du -sh /home/runner/workspace/coinos || true
 
     - name: Setup ccache
       uses: actions/cache@v4
@@ -138,7 +214,7 @@ jobs:
     - name: Build ROM
       shell: bash
       run: |
-        cd ~/workspace/coinos
+        cd /home/runner/workspace/coinos
 
         if [ "${{ github.event.inputs.clean_build }}" = "true" ]; then
           make clean
@@ -171,7 +247,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: CoinOS-j7xelte-ROM
-        path: ~/workspace/coinos/out/target/product/j7xelte/CoinOS*.zip
+        path: /home/runner/workspace/coinos/out/target/product/j7xelte/CoinOS*.zip
         if-no-files-found: error
         retention-days: 7
 
@@ -181,8 +257,9 @@ jobs:
       with:
         name: build-logs
         path: |
-          ~/workspace/coinos/out/build_*.log
-          ~/workspace/coinos/out/verbose.log.gz
-          ~/workspace/coinos/out/error.log
+          /home/runner/workspace/coinos/out/build_*.log
+          /home/runner/workspace/coinos/out/verbose.log.gz
+          /home/runner/workspace/coinos/out/error.log
+          /tmp/repo_sync.log
         if-no-files-found: ignore
         retention-days: 7
