@@ -137,29 +137,37 @@ jobs:
 
         # Verify that linked repositories are accessible
         echo "=== Checking repository accessibility ==="
+        REPOS_OK=true
         for repo_url in \
           "https://github.com/${REPO_NAME}" \
           "https://github.com/eoftisreal/android_kernel_samsung_exynos7870" \
           "https://github.com/eoftisreal/android_vendor_samsung_j7xelte"; do
-          if curl -fsSL --retry 2 -o /dev/null -w "%{http_code}" "${repo_url}" | grep -q "200"; then
+          HTTP_CODE=$(curl -sSL --retry 2 -o /dev/null -w "%{http_code}" "${repo_url}" || echo "000")
+          if [ "${HTTP_CODE}" = "200" ]; then
             echo "  OK: ${repo_url}"
           else
-            echo "  WARNING: ${repo_url} may not be accessible (non-200 status)"
+            echo "  ERROR: ${repo_url} returned HTTP ${HTTP_CODE}"
+            REPOS_OK=false
           fi
         done
+        if [ "${REPOS_OK}" != "true" ]; then
+          echo "ERROR: One or more required repositories are not accessible. Aborting."
+          exit 1
+        fi
 
         # Sync the source code with retry logic and cleanup between attempts
+        MIN_DISK_SPACE_GB=10
         for attempt in 1 2 3; do
           echo "=== repo sync attempt ${attempt} of 3 ==="
           echo "Disk space before sync attempt:"
           df -h /home/runner/workspace
 
-          # Check minimum disk space (need at least 10GB free)
+          # Check minimum disk space
           AVAIL_KB=$(df --output=avail /home/runner/workspace | tail -1)
           AVAIL_GB=$((AVAIL_KB / 1024 / 1024))
           echo "Available space: ${AVAIL_GB}GB"
-          if [ "${AVAIL_GB}" -lt 10 ]; then
-            echo "WARNING: Low disk space (${AVAIL_GB}GB available). Cleaning up..."
+          if [ "${AVAIL_GB}" -lt "${MIN_DISK_SPACE_GB}" ]; then
+            echo "WARNING: Low disk space (${AVAIL_GB}GB < ${MIN_DISK_SPACE_GB}GB). Cleaning up..."
             # Remove repo trace and garbage files to reclaim space
             rm -f .repo/.repo_trace 2>/dev/null || true
             find .repo -name "*.lock" -delete 2>/dev/null || true
@@ -190,8 +198,10 @@ jobs:
           repo forall -c 'git gc --aggressive --prune=now' 2>/dev/null || true
           echo "Disk space after cleanup:"
           df -h /home/runner/workspace
-          echo "Retrying in 30 seconds..."
-          sleep 30
+          # Exponential backoff: 15s, 30s, 60s
+          RETRY_DELAY=$((15 * (2 ** (attempt - 1))))
+          echo "Retrying in ${RETRY_DELAY} seconds..."
+          sleep "${RETRY_DELAY}"
         done
 
     - name: Check disk space
