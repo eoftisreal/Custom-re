@@ -185,9 +185,10 @@ status, and only compute readiness after the validation gates are complete.
 | Item | Target |
 | --- | --- |
 | Device variants | SM-J710FN (j7xelte); add any additional supported SKUs |
-| Android version | CoinOS 1.0 (Android 12 / API 31) |
+| ROM version | CoinOS 1.0 |
+| Android version | Android 12 (API 31) |
 | Build variants | userdebug (dev), user (release) |
-| Security patch level | YYYY-MM (target; align with ASB and record in release notes) |
+| Security patch level | YYYY-MM (e.g., 2024-01; align with ASB and record in release notes) |
 | Must-have features | See checklist below |
 
 **Must-have feature checklist (all must pass):**
@@ -196,7 +197,7 @@ status, and only compute readiness after the validation gates are complete.
 - [ ] IMS: VoLTE/VT/WFC (if required for target markets)
 - [ ] Camera: rear/front, photo + video recording
 - [ ] Audio: playback + microphone recording
-- [ ] Wi‑Fi + Bluetooth + GPS functional
+- [ ] Wi-Fi + Bluetooth + GPS functional
 - [ ] USB OTG + MTP/ADB stable
 - [ ] Storage + encryption (FDE) functional
 
@@ -216,8 +217,8 @@ status, and only compute readiness after the validation gates are complete.
 - [ ] Graphics: SurfaceFlinger stable, no major UI corruption
 - [ ] Sensors: accel/gyro/proximity/light working
 - [ ] Storage: mount_all, fstab, SD card, OTG storage
-- [ ] USB: host/gadget modes; external Wi‑Fi module loads
-- [ ] Wi‑Fi/BT: scan/connect/roam, hotspot, BT audio
+- [ ] USB: host/gadget modes; external Wi-Fi module loads
+- [ ] Wi-Fi/BT: scan/connect/roam, hotspot, BT audio
 - [ ] SELinux: enforcing, no new denials in normal use
 
 ### Performance Checklist
@@ -251,7 +252,7 @@ status, and only compute readiness after the validation gates are complete.
 ### Validation Gates (must complete before readiness score)
 
 - [ ] Build success on clean tree
-- [ ] Device smoke tests pass (boot, basic calls, Wi‑Fi, camera)
+- [ ] Device smoke tests pass (boot, basic calls, Wi-Fi, camera)
 - [ ] Soak test (overnight idle + usage) with no reboots
 - [ ] CTS/VTS where applicable (record pass rate or N/A)
 - [ ] Regression suite re-run after fixes
@@ -266,7 +267,7 @@ for critical areas; do not publish a percentage without test data.
 | Boot & Stability | 20 |  |  |
 | RIL/IMS | 15 |  |  |
 | Camera/Media | 15 |  |  |
-| Wi‑Fi/BT/GPS | 10 |  |  |
+| Wi-Fi/BT/GPS | 10 |  |  |
 | Performance | 10 |  |  |
 | Power/Thermal | 10 |  |  |
 | Security | 10 |  |  |
