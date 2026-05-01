@@ -1,5 +1,16 @@
 name: Build CoinOS for Samsung Galaxy J7 (j7xelte)
 
+# NOTE: This workflow targets GitHub-hosted runners (ubuntu-22.04) which have
+# limited disk space (~35 GB).  It includes space-saving hacks such as the
+# maximize-build-space action and aggressive package cleanup that are NOT
+# needed on DigitalOcean Droplets.
+#
+# For DigitalOcean Droplets (100 GB+ disk, dedicated CPU/RAM) use the
+# separate, optimized workflow instead:
+#   .github/workflows/build-coinos-digitalocean.yml
+#
+# See DIGITALOCEAN_SETUP.md for full setup instructions.
+
 on:
   workflow_dispatch:
     inputs:
