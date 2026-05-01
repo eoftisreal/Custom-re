@@ -174,6 +174,108 @@ lunch coin_j7xelte-userdebug
 mka bacon
 ```
 
+## Release Readiness & Validation
+
+Use this section to implement the full readiness plan and produce a defensible
+“chance it works” percentage. Fill in the target definition, track validation
+status, and only compute readiness after the validation gates are complete.
+
+### Target Definition (fill in for each release)
+
+| Item | Target |
+| --- | --- |
+| Device variants | SM-J710FN (j7xelte); add any additional supported SKUs |
+| Android version | CoinOS 1.0 (Android 12 / API 31) |
+| Build variants | userdebug (dev), user (release) |
+| Security patch level | YYYY-MM (target) |
+| Must-have features | See checklist below |
+
+**Must-have feature checklist (all must pass):**
+- [ ] Boots to home screen without fatal crashes or boot loops
+- [ ] RIL: voice/SMS/data stable on primary carrier(s)
+- [ ] IMS: VoLTE/VT/WFC (if required for target markets)
+- [ ] Camera: rear/front, photo + video recording
+- [ ] Audio: playback + microphone recording
+- [ ] Wi‑Fi + Bluetooth + GPS functional
+- [ ] USB OTG + MTP/ADB stable
+- [ ] Storage + encryption (FDE) functional
+
+### Baseline Checklist
+
+- [ ] Kernel source present at `kernel/samsung/exynos7870` (record commit)
+- [ ] Vendor blobs present at `vendor/samsung/j7xelte` (record firmware build)
+- [ ] Clean build completes (`mka bacon`) and boots (record build ID)
+- [ ] “Known Limitations” section updated with current issues
+
+### Stability & Compatibility Checklist
+
+- [ ] Boot: no kernel panics, watchdogs, or random reboots
+- [ ] RIL/IMS: stable registration, calls, SMS, data, VoLTE/VT/WFC
+- [ ] Camera: preview, capture, focus, flash, HDR, video
+- [ ] Media: hardware decode/encode, DRM playback
+- [ ] Graphics: SurfaceFlinger stable, no major UI corruption
+- [ ] Sensors: accel/gyro/proximity/light working
+- [ ] Storage: mount_all, fstab, SD card, OTG storage
+- [ ] USB: host/gadget modes; external Wi‑Fi module loads
+- [ ] Wi‑Fi/BT: scan/connect/roam, hotspot, BT audio
+- [ ] SELinux: enforcing, no new denials in normal use
+
+### Performance Checklist
+
+- [ ] Boot time measured and within target
+- [ ] App launch time measured for common apps
+- [ ] Memory pressure: LMKD kills acceptable, no thrashing
+- [ ] UI smoothness acceptable (jank not excessive)
+- [ ] I/O responsiveness acceptable under load
+
+### Power & Thermal Checklist
+
+- [ ] Doze/idle works; no runaway wakelocks
+- [ ] cpuidle + thermal governors stable under sustained load
+- [ ] No thermal shutdowns during stress tests
+
+### Security Checklist
+
+- [ ] SELinux enforcing from first-stage init
+- [ ] Verified boot/verity alignment for release builds
+- [ ] Kernel hardening/backports reviewed for Android 12
+- [ ] Security patch level updated to target
+
+### UX & Feature Parity Checklist
+
+- [ ] Gesture navigation enabled and reliable
+- [ ] Adaptive Battery + app standby buckets verified
+- [ ] Privacy toggles present (mic/camera/clipboard)
+- [ ] Optional GApps compatibility confirmed
+
+### Validation Gates (must complete before readiness score)
+
+- [ ] Build success on clean tree
+- [ ] Device smoke tests pass (boot, basic calls, Wi‑Fi, camera)
+- [ ] Soak test (overnight idle + usage) with no reboots
+- [ ] CTS/VTS where applicable (record pass rate or N/A)
+- [ ] Regression suite re-run after fixes
+
+### Readiness Scoring (“chance it works”)
+
+Compute readiness only after all validation gates complete. Use weighted scoring
+for critical areas; do not publish a percentage without test data.
+
+| Area | Weight | Status (Pass/Partial/Fail) | Score |
+| --- | --- | --- | --- |
+| Boot & Stability | 20 |  |  |
+| RIL/IMS | 15 |  |  |
+| Camera/Media | 15 |  |  |
+| Wi‑Fi/BT/GPS | 10 |  |  |
+| Performance | 10 |  |  |
+| Power/Thermal | 10 |  |  |
+| Security | 10 |  |  |
+| UX Parity | 10 |  |  |
+
+**Formula:** readiness % = sum(weight × score) / sum(weights), where score is
+1.0 (pass), 0.5 (partial), or 0.0 (fail). Adjust weights if your release has
+different priorities, but keep the calculation explicit in release notes.
+
 ## Android 12 Porting Notes
 
 ### Key Engineering Challenges
