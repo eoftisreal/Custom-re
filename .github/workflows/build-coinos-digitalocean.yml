@@ -258,8 +258,8 @@ jobs:
         # Requires secrets: DO_SPACES_KEY, DO_SPACES_SECRET, DO_SPACES_BUCKET, DO_SPACES_REGION
         if: >
           success() &&
-          secrets.DO_SPACES_KEY &&
-          secrets.DO_SPACES_SECRET
+          secrets.DO_SPACES_KEY != '' &&
+          secrets.DO_SPACES_SECRET != ''
         env:
           DO_SPACES_KEY: ${{ secrets.DO_SPACES_KEY }}
           DO_SPACES_SECRET: ${{ secrets.DO_SPACES_SECRET }}
@@ -273,7 +273,8 @@ jobs:
 
           # Write s3cmd config from secrets into the runner's temp directory
           # (automatically cleaned up by the runner after the job completes)
-          S3CFG="${RUNNER_TEMP}/s3cfg_do_$$"
+          # RUNNER_TEMP is unique per job, so a fixed filename is safe here.
+          S3CFG="${RUNNER_TEMP}/s3cfg_do"
           cat > "${S3CFG}" << EOF
           [default]
           access_key = ${DO_SPACES_KEY}
@@ -309,7 +310,7 @@ jobs:
         if: >
           always() &&
           github.event.inputs.notify_slack == 'true' &&
-          secrets.SLACK_WEBHOOK_URL
+          secrets.SLACK_WEBHOOK_URL != ''
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           JOB_STATUS: ${{ job.status }}
@@ -336,8 +337,8 @@ jobs:
         if: >
           always() &&
           github.event.inputs.notify_email == 'true' &&
-          secrets.NOTIFY_EMAIL &&
-          secrets.SENDGRID_API_KEY
+          secrets.NOTIFY_EMAIL != '' &&
+          secrets.SENDGRID_API_KEY != ''
         env:
           NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
           SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}

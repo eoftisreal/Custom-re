@@ -39,6 +39,9 @@ DO_SPACES_REGION="${DO_SPACES_REGION:-nyc3}"
 S3CFG="${HOME}/.s3cfg_cleanup_$$"
 # ─────────────────────────────────────────────────────────────────────────────
 
+# Ensure the credentials file is removed on exit regardless of how the script ends
+trap 'rm -f "${S3CFG}"' EXIT
+
 log()  { echo "[$(date -u +"%Y-%m-%d %H:%M:%S")] [INFO]  $*"; }
 warn() { echo "[$(date -u +"%Y-%m-%d %H:%M:%S")] [WARN]  $*" >&2; }
 
@@ -207,7 +210,7 @@ main() {
   print_disk_report
   cleanup_zips
   cleanup_logs
-  cleanup_s3cfg
+  # cleanup_s3cfg is handled by the EXIT trap defined at the top of the script
   print_disk_report
   log "Cleanup complete."
 }

@@ -49,7 +49,7 @@ install_dependencies() {
     liblz4-tool libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libwxgtk3.0-gtk3-dev \
     libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc \
     zip zlib1g-dev python3 python-is-python3 "openjdk-${JAVA_VERSION}-jdk" \
-    s3cmd xmllint jq wget unzip
+    s3cmd jq wget unzip
 
   log "Build dependencies installed."
 }
@@ -74,9 +74,10 @@ create_build_user() {
   else
     log "Creating build user '${BUILD_USER}'..."
     useradd -m -s /bin/bash -G sudo "${BUILD_USER}"
-    # Allow passwordless sudo only for the specific commands required by build operations
+    # Allow passwordless sudo only for specific commands needed during build setup
+    # Using quoted fixed paths avoids wildcard privilege-escalation risks.
     cat > "/etc/sudoers.d/${BUILD_USER}" << SUDOERS
-${BUILD_USER} ALL=(ALL) NOPASSWD: /usr/bin/apt-get, /usr/bin/apt, /bin/mkdir, /bin/chown, /bin/chmod, /usr/bin/install, /bin/cp, /bin/mv
+${BUILD_USER} ALL=(ALL) NOPASSWD: /usr/bin/apt-get update, /usr/bin/apt-get install *, /usr/bin/apt-get clean, /usr/bin/apt-get upgrade *
 SUDOERS
     chmod 440 "/etc/sudoers.d/${BUILD_USER}"
   fi
