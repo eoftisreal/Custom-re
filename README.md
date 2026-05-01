@@ -187,7 +187,7 @@ status, and only compute readiness after the validation gates are complete.
 | Device variants | SM-J710FN (j7xelte); add any additional supported SKUs |
 | Android version | CoinOS 1.0 (Android 12 / API 31) |
 | Build variants | userdebug (dev), user (release) |
-| Security patch level | YYYY-MM (target) |
+| Security patch level | YYYY-MM (target; align with ASB and record in release notes) |
 | Must-have features | See checklist below |
 
 **Must-have feature checklist (all must pass):**
@@ -202,9 +202,9 @@ status, and only compute readiness after the validation gates are complete.
 
 ### Baseline Checklist
 
-- [ ] Kernel source present at `kernel/samsung/exynos7870` (record commit)
-- [ ] Vendor blobs present at `vendor/samsung/j7xelte` (record firmware build)
-- [ ] Clean build completes (`mka bacon`) and boots (record build ID)
+- [ ] Kernel source present at `kernel/samsung/exynos7870` (record commit in release notes or changelog)
+- [ ] Vendor blobs present at `vendor/samsung/j7xelte` (record firmware build in release notes or changelog)
+- [ ] Clean build completes (`mka bacon`) and boots (record build ID in release notes or changelog)
 - [ ] “Known Limitations” section updated with current issues
 
 ### Stability & Compatibility Checklist
