@@ -1,6 +1,6 @@
 name: Build CoinOS for Samsung Galaxy J7 (j7xelte) — DigitalOcean
 
-# Optimized for DigitalOcean Droplets (Ubuntu 22.04, 8+ vCPU, 16GB+ RAM, 200GB+ disk).
+# Optimized for DigitalOcean Droplets (Ubuntu 24.04, 2+ vCPU, 4GB+ RAM, 120GB+ disk).
 # Key differences from the GitHub-hosted-runner version (build-coinos.yml):
 #   - No disk-space mitigation (maximize-build-space, package cleanup)
 #   - repo sync runs with -j8 instead of -j2
@@ -32,7 +32,7 @@ on:
 jobs:
   preflight:
     name: Pre-flight checks
-    runs-on: self-hosted
+    runs-on: [self-hosted, linux, x64, j7xelte, android]
     outputs:
       repos_ok: ${{ steps.check_repos.outputs.repos_ok }}
     steps:
@@ -87,7 +87,7 @@ jobs:
 
   build:
     name: Build CoinOS ROM
-    runs-on: self-hosted
+    runs-on: [self-hosted, linux, x64, j7xelte, android]
     needs: preflight
     timeout-minutes: 360
     env:
