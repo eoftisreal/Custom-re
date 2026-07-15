@@ -26,13 +26,13 @@ GitHub-hosted runners.
 
 | Resource | Minimum | Recommended |
 |----------|---------|-------------|
-| vCPU     | 4       | **8**       |
-| RAM      | 8 GB    | **16 GB**   |
-| Disk     | 100 GB  | **200 GB**  |
-| OS       | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
+| vCPU     | 2       | **2**       |
+| RAM      | 4 GB    | **4 GB**   |
+| Disk     | 120 GB  | **120 GB**  |
+| OS       | Ubuntu 24.04 LTS | Ubuntu 24.04 LTS |
 | Region   | Nearest to you | `sfo3` / `nyc3` |
 
-**DigitalOcean slug:** `s-8vcpu-16gb` (~$96/month on-demand, ~$0.143/hour)
+**DigitalOcean slug:** `s-2vcpu-4gb-120gb-intel` (~$32/month on-demand, ~$0.048/hour)
 
 > **Tip:** Use a Droplet Snapshot to save the configured state. You can destroy the
 > Droplet after a build run and restore from the snapshot next time to save costs
@@ -54,8 +54,8 @@ doctl auth init
 # Create the Droplet (replace YOUR_SSH_KEY_ID with your key fingerprint)
 doctl compute droplet create coinos-builder \
   --region sfo3 \
-  --size s-8vcpu-16gb \
-  --image ubuntu-22-04-x64 \
+  --size s-2vcpu-4gb-120gb-intel \
+  --image ubuntu-24-04-x64 \
   --ssh-keys YOUR_SSH_KEY_ID \
   --tag-names coinos-ci \
   --wait
@@ -67,8 +67,8 @@ doctl compute droplet get coinos-builder --format PublicIPv4
 ### Using the DigitalOcean Web Console
 
 1. Go to **Create → Droplets**
-2. Choose **Ubuntu 22.04 (LTS) x64**
-3. Select plan: **Basic → Premium Intel → 8 vCPU / 16 GB / 200 GB NVMe SSD**
+2. Choose **Ubuntu 24.04 (LTS) x64**
+3. Select plan: **Basic → Premium Intel → 2 vCPU / 4 GB / 120 GB NVMe SSD**
 4. Choose a datacenter region
 5. Add your SSH key
 6. Click **Create Droplet**
@@ -132,7 +132,7 @@ tar xzf actions-runner-linux-x64.tar.gz
   --url https://github.com/eoftisreal/Custom-re \
   --token <YOUR_REGISTRATION_TOKEN> \
   --name coinos-do-runner \
-  --labels self-hosted,linux,x64,digitalocean \
+  --labels self-hosted,linux,x64,j7xelte,android \
   --work /opt/coinos-build/runner-work \
   --unattended
 
@@ -241,10 +241,10 @@ Add to `builder`'s crontab to run every Sunday at midnight:
 
 | Resource | Size | Est. monthly cost |
 |----------|------|------------------|
-| Droplet (on-demand) | s-8vcpu-16gb | ~$96 |
+| Droplet (on-demand) | s-2vcpu-4gb-120gb-intel | ~$32 |
 | Spaces storage | 100 GB | ~$5 |
 | Spaces bandwidth | 1 TB included | $0 |
-| **Total** | | **~$101 / month** |
+| **Total** | | **~$37 / month** |
 
 **Cost-saving tip:** Take a Droplet Snapshot (~$0.06/GB/month) and destroy the
 Droplet between builds. Restore from snapshot when needed to pay only for compute
