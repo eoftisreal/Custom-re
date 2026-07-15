@@ -10,7 +10,7 @@
 #   # or, after cloning the repo:
 #   bash scripts/do-build-init.sh
 #
-# Recommended Droplet: Ubuntu 22.04, 8 vCPU, 16GB RAM, 200GB SSD (s-8vcpu-16gb)
+# Recommended Droplet: Ubuntu 24.04, 2 vCPU, 4GB RAM, 120GB SSD (s-2vcpu-4gb-120gb-intel)
 
 set -euo pipefail
 
