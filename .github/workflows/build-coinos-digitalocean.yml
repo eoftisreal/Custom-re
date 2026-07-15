@@ -18,16 +18,6 @@ on:
         required: false
         type: boolean
         default: false
-      notify_slack:
-        description: 'Send Slack notification on completion'
-        required: false
-        type: boolean
-        default: false
-      notify_email:
-        description: 'Send email notification on completion'
-        required: false
-        type: boolean
-        default: false
 
 jobs:
   preflight:
@@ -256,13 +246,17 @@ jobs:
 
       - name: Upload ROM to DigitalOcean Spaces
         # Requires secrets: DO_SPACES_KEY, DO_SPACES_SECRET, DO_SPACES_BUCKET, DO_SPACES_REGION
-        if: ${{ success() && secrets.DO_SPACES_KEY != '' && secrets.DO_SPACES_SECRET != '' }}
+        if: success()
         env:
           DO_SPACES_KEY: ${{ secrets.DO_SPACES_KEY }}
           DO_SPACES_SECRET: ${{ secrets.DO_SPACES_SECRET }}
           DO_SPACES_BUCKET: ${{ secrets.DO_SPACES_BUCKET }}
           DO_SPACES_REGION: ${{ secrets.DO_SPACES_REGION }}
         run: |
+          if [ -z "${DO_SPACES_KEY}" ] || [ -z "${DO_SPACES_SECRET}" ]; then
+            echo "Skipping upload: DO_SPACES_KEY or DO_SPACES_SECRET is not set."
+            exit 0
+          fi
           OUT_DIR="${WORKSPACE_DIR}/out/target/product/j7xelte"
           REGION="${DO_SPACES_REGION:-nyc3}"
           BUCKET="${DO_SPACES_BUCKET:-coinos-builds}"
@@ -303,46 +297,3 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
-      - name: Notify Slack on completion
-        if: ${{ always() && github.event.inputs.notify_slack == 'true' && secrets.SLACK_WEBHOOK_URL != '' }}
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          JOB_STATUS: ${{ job.status }}
-        run: |
-          COLOR="good"
-          ICON=":white_check_mark:"
-          if [ "${JOB_STATUS}" != "success" ]; then
-            COLOR="danger"
-            ICON=":x:"
-          fi
-          curl -fsSL -X POST "${SLACK_WEBHOOK_URL}" \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"attachments\": [{
-                \"color\": \"${COLOR}\",
-                \"title\": \"${ICON} CoinOS Build ${JOB_STATUS^}\",
-                \"text\": \"Build ID: \`${BUILD_TIMESTAMP}\`\nRepo: \`${{ github.repository }}\`\nBranch: \`${{ github.ref_name }}\`\nTriggered by: ${{ github.actor }}\",
-                \"footer\": \"DigitalOcean CI\",
-                \"ts\": $(date +%s)
-              }]
-            }"
-
-      - name: Notify email on completion
-        if: ${{ always() && github.event.inputs.notify_email == 'true' && secrets.NOTIFY_EMAIL != '' && secrets.SENDGRID_API_KEY != '' }}
-        env:
-          NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
-          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
-          JOB_STATUS: ${{ job.status }}
-        run: |
-          curl -fsSL -X POST https://api.sendgrid.com/v3/mail/send \
-            -H "Authorization: Bearer ${SENDGRID_API_KEY}" \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"personalizations\": [{\"to\": [{\"email\": \"${NOTIFY_EMAIL}\"}]}],
-              \"from\": {\"email\": \"ci@coinos-build.local\", \"name\": \"CoinOS CI\"},
-              \"subject\": \"CoinOS Build ${JOB_STATUS^} — ${BUILD_TIMESTAMP}\",
-              \"content\": [{
-                \"type\": \"text/plain\",
-                \"value\": \"Build ID: ${BUILD_TIMESTAMP}\nStatus: ${JOB_STATUS}\nRepo: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nTriggered by: ${{ github.actor }}\n\nView run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
-              }]
-            }"
