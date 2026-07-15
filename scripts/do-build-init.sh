@@ -83,6 +83,22 @@ SUDOERS
   fi
 }
 
+
+# ─── Swap configuration ──────────────────────────────────────────────────────
+setup_swap() {
+  log "Configuring 16GB swap file (required for 4GB droplets)..."
+  if ! swapon --show | grep -q "/swapfile"; then
+    fallocate -l 16G /swapfile
+    chmod 600 /swapfile
+    mkswap /swapfile
+    swapon /swapfile
+    echo '/swapfile none swap sw 0 0' >> /etc/fstab
+    log "Swap enabled."
+  else
+    log "Swap already configured."
+  fi
+}
+
 # ─── Workspace directory ─────────────────────────────────────────────────────
 setup_workspace() {
   log "Setting up workspace at ${WORKSPACE_ROOT}..."
@@ -183,6 +199,7 @@ main() {
   install_dependencies
   install_repo_tool
   create_build_user
+  setup_swap
   setup_workspace
   configure_ccache
   configure_git
