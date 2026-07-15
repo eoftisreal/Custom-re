@@ -146,26 +146,6 @@ jobs:
         }
         echo "Local manifest XML is valid."
 
-        # Verify that linked repositories are accessible
-        echo "=== Checking repository accessibility ==="
-        REPOS_OK=true
-        for repo_url in \
-          "https://github.com/${REPO_NAME}" \
-          "https://github.com/eoftisreal/android_kernel_samsung_exynos7870" \
-          "https://github.com/eoftisreal/android_vendor_samsung_j7xelte"; do
-          HTTP_CODE=$(curl -sSL --retry 2 -o /dev/null -w "%{http_code}" "${repo_url}" || echo "000")
-          if [ "${HTTP_CODE}" = "200" ]; then
-            echo "  OK: ${repo_url}"
-          else
-            echo "  ERROR: ${repo_url} returned HTTP ${HTTP_CODE}"
-            REPOS_OK=false
-          fi
-        done
-        if [ "${REPOS_OK}" != "true" ]; then
-          echo "ERROR: One or more required repositories are not accessible. Aborting."
-          exit 1
-        fi
-
         # Sync the source code with retry logic and cleanup between attempts
         MIN_DISK_SPACE_GB=10
         for attempt in 1 2 3; do
