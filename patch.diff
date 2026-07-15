@@ -1,0 +1,62 @@
+--- .github/workflows/build-coinos-digitalocean.yml
++++ .github/workflows/build-coinos-digitalocean.yml
+@@ -256,9 +256,7 @@
+       - name: Upload ROM to DigitalOcean Spaces
+         # Requires secrets: DO_SPACES_KEY, DO_SPACES_SECRET, DO_SPACES_BUCKET, DO_SPACES_REGION
+-        if: >
+-          success() &&
+-          '${{ secrets.DO_SPACES_KEY }}' != '' &&
+-          '${{ secrets.DO_SPACES_SECRET }}' != ''
++        if: success()
+         env:
+           DO_SPACES_KEY: ${{ secrets.DO_SPACES_KEY }}
+           DO_SPACES_SECRET: ${{ secrets.DO_SPACES_SECRET }}
+@@ -268,6 +266,11 @@
+           OUT_DIR="${WORKSPACE_DIR}/out/target/product/j7xelte"
+           REGION="${DO_SPACES_REGION:-nyc3}"
+           BUCKET="${DO_SPACES_BUCKET:-coinos-builds}"
+           DEST_PREFIX="s3://${BUCKET}/coinos-builds/${BUILD_TIMESTAMP}"
++
++          if [ -z "${DO_SPACES_KEY}" ] || [ -z "${DO_SPACES_SECRET}" ]; then
++            echo "Skipping upload: DO_SPACES_KEY or DO_SPACES_SECRET secret is not set."
++            exit 0
++          fi
+
+           # Write s3cmd config from secrets into the runner's temp directory
+@@ -308,9 +311,7 @@
+       - name: Notify Slack on completion
+         if: >
+           always() &&
+-          github.event.inputs.notify_slack == 'true' &&
+-          '${{ secrets.SLACK_WEBHOOK_URL }}' != ''
++          github.event.inputs.notify_slack == 'true'
+         env:
+           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+           JOB_STATUS: ${{ job.status }}
+         run: |
++          if [ -z "${SLACK_WEBHOOK_URL}" ]; then
++            echo "Skipping Slack notification: SLACK_WEBHOOK_URL secret is not set."
++            exit 0
++          fi
+           COLOR="good"
+           ICON=":white_check_mark:"
+@@ -335,10 +336,7 @@
+       - name: Notify email on completion
+         if: >
+           always() &&
+-          github.event.inputs.notify_email == 'true' &&
+-          '${{ secrets.NOTIFY_EMAIL }}' != '' &&
+-          '${{ secrets.SENDGRID_API_KEY }}' != ''
++          github.event.inputs.notify_email == 'true'
+         env:
+           NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
+           SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+@@ -346,6 +344,10 @@
+         run: |
++          if [ -z "${NOTIFY_EMAIL}" ] || [ -z "${SENDGRID_API_KEY}" ]; then
++            echo "Skipping email notification: NOTIFY_EMAIL or SENDGRID_API_KEY secret is not set."
++            exit 0
++          fi
+           curl -fsSL -X POST https://api.sendgrid.com/v3/mail/send \
+             -H "Authorization: Bearer ${SENDGRID_API_KEY}" \
+             -H "Content-Type: application/json" \

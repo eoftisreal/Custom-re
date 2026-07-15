@@ -256,10 +256,7 @@ jobs:
 
       - name: Upload ROM to DigitalOcean Spaces
         # Requires secrets: DO_SPACES_KEY, DO_SPACES_SECRET, DO_SPACES_BUCKET, DO_SPACES_REGION
-        if: >
-          success() &&
-          '${{ secrets.DO_SPACES_KEY }}' != '' &&
-          '${{ secrets.DO_SPACES_SECRET }}' != ''
+        if: ${{ success() && secrets.DO_SPACES_KEY != '' && secrets.DO_SPACES_SECRET != '' }}
         env:
           DO_SPACES_KEY: ${{ secrets.DO_SPACES_KEY }}
           DO_SPACES_SECRET: ${{ secrets.DO_SPACES_SECRET }}
@@ -307,10 +304,7 @@ jobs:
           retention-days: 14
 
       - name: Notify Slack on completion
-        if: >
-          always() &&
-          github.event.inputs.notify_slack == 'true' &&
-          '${{ secrets.SLACK_WEBHOOK_URL }}' != ''
+        if: ${{ always() && github.event.inputs.notify_slack == 'true' && secrets.SLACK_WEBHOOK_URL != '' }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           JOB_STATUS: ${{ job.status }}
@@ -334,11 +328,7 @@ jobs:
             }"
 
       - name: Notify email on completion
-        if: >
-          always() &&
-          github.event.inputs.notify_email == 'true' &&
-          '${{ secrets.NOTIFY_EMAIL }}' != '' &&
-          '${{ secrets.SENDGRID_API_KEY }}' != ''
+        if: ${{ always() && github.event.inputs.notify_email == 'true' && secrets.NOTIFY_EMAIL != '' && secrets.SENDGRID_API_KEY != '' }}
         env:
           NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
           SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
