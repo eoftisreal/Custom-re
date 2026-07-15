@@ -35,16 +35,17 @@ jobs:
             echo "WARNING: Less than 80GB free. Consider running cleanup-old-builds.sh first."
           fi
 
-          echo "=== Swap space on runner ==="
+          echo "=== Memory & Swap on runner ==="
           free -h
+          RAM_GB=$(free -g | awk '/^Mem:/ {print $2}')
           SWAP_GB=$(free -g | awk '/^Swap:/ {print $2}')
-          echo "Total Swap: ${SWAP_GB} GB"
-          if [ -z "${SWAP_GB}" ] || [ "${SWAP_GB}" -lt 8 ]; then
-            echo "ERROR: Insufficient swap space. Android builds on 4GB RAM require at least 8GB of swap."
-            echo "Please re-run scripts/do-build-init.sh on your Droplet to configure a swapfile."
+          TOTAL_MEM=$((RAM_GB + SWAP_GB))
+          echo "Total RAM: ${RAM_GB} GB | Total Swap: ${SWAP_GB} GB | Combined: ${TOTAL_MEM} GB"
+          if [ -z "${TOTAL_MEM}" ] || [ "${TOTAL_MEM}" -lt 12 ]; then
+            echo "ERROR: Insufficient memory. Android builds require at least 12GB of combined RAM + Swap."
+            echo "Please either increase your Droplet RAM, or re-run scripts/do-build-init.sh to configure a swapfile."
             exit 1
           fi
-
       - name: Check required dependencies
         run: |
           for cmd in git repo ccache curl xmllint java; do
