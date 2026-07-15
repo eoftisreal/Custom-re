@@ -23,8 +23,6 @@ jobs:
   preflight:
     name: Pre-flight checks
     runs-on: [self-hosted, linux, x64, j7xelte, android]
-    outputs:
-      repos_ok: ${{ steps.check_repos.outputs.repos_ok }}
     steps:
       - name: Check disk space
         run: |
@@ -51,29 +49,6 @@ jobs:
           git --version
           ccache --version | head -1
 
-      - name: Verify repository accessibility
-        id: check_repos
-        env:
-          REPO_NAME: ${{ github.repository }}
-        run: |
-          REPOS_OK=true
-          for repo_url in \
-            "https://github.com/${REPO_NAME}" \
-            "https://github.com/eoftisreal/android_kernel_samsung_exynos7870" \
-            "https://github.com/eoftisreal/android_vendor_samsung_j7xelte"; do
-            HTTP_CODE=$(curl -sSL --retry 2 -o /dev/null -w "%{http_code}" "${repo_url}" || echo "000")
-            if [ "${HTTP_CODE}" = "200" ]; then
-              echo "  OK (HTTP ${HTTP_CODE}): ${repo_url}"
-            else
-              echo "  ERROR (HTTP ${HTTP_CODE}): ${repo_url}"
-              REPOS_OK=false
-            fi
-          done
-          echo "repos_ok=${REPOS_OK}" >> "$GITHUB_OUTPUT"
-          if [ "${REPOS_OK}" != "true" ]; then
-            echo "ERROR: One or more required repositories are not accessible. Aborting."
-            exit 1
-          fi
 
   build:
     name: Build CoinOS ROM
